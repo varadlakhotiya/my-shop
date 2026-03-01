@@ -101,7 +101,7 @@ select {
 
 
 /* ══════════════════════════════════════════════
-   TABLET (≤ 900px) — minor tweaks on top of existing
+   TABLET (<=900px) — minor tweaks on top of existing
    ══════════════════════════════════════════════ */
 @media (max-width: 900px) {
 
@@ -112,6 +112,52 @@ select {
 
     body {
         padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ── Bottom bar button labels: Marathi + English stacked ── */
+    .mob-info-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1px;
+        padding: 4px 2px;
+        min-height: 56px;
+    }
+
+    .mob-btn-icon {
+        font-size: 20px;
+        line-height: 1;
+        display: block;
+    }
+
+    .mob-btn-mr {
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1.2;
+        display: block;
+        text-align: center;
+        /* Marathi text can be long — allow line break */
+        white-space: normal;
+        max-width: 52px;
+        word-break: break-word;
+        hyphens: auto;
+    }
+
+    .mob-btn-en {
+        font-size: 8.5px;
+        font-weight: 500;
+        color: #666;
+        line-height: 1.1;
+        display: block;
+        text-align: center;
+    }
+
+    /* Active state */
+    .mob-info-btn.active .mob-btn-mr,
+    .mob-info-btn.active .mob-btn-en {
+        color: var(--primary);
     }
 
     /* ── Scrollable areas: smooth momentum on iOS ── */
@@ -127,69 +173,107 @@ select {
     .location-map iframe {
         height: 260px;
     }
+
+    /* ── Toast: keep above bottom bar on tablet too ── */
+    .toast-container {
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+        z-index: 9999 !important;
+    }
 }
 
 
 /* ══════════════════════════════════════════════
-   MOBILE (≤ 600px) — All critical mobile fixes
+   MOBILE (<=600px) — All critical mobile fixes
    ══════════════════════════════════════════════ */
 @media (max-width: 600px) {
 
-    /* ─────────────────────────────────────────
-       HEADER — prevent overflow on small phones
-       ───────────────────────────────────────── */
-    .header-inner {
-        gap: 6px;
-        padding: 0 10px;
+    /* -----------------------------------------
+       HEADER — Amazon-style 2-row layout
+       Row 1: Logo  |  Wishlist + Cart
+       Row 2: Search bar (full width)
+       ----------------------------------------- */
+
+    :root { --header-h: 100px; }
+
+    #main-header {
+        height: auto !important;
     }
 
-    /* Logo: shrink for small screens */
-    .logo-area {
-        flex-shrink: 1;
-        min-width: 0;
+    .header-inner {
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 8px 12px;
+        gap: 0;
+        row-gap: 6px;
     }
+
+    /* Row 1 left: Logo */
+    .logo-area {
+        flex: 1;
+        min-width: 0;
+        order: 1;
+    }
+    .logo-emoji { font-size: 22px; }
     .logo-en {
-        font-size: 12px;
+        font-size: 13px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 120px;
+        max-width: 160px;
     }
+    .logo-mr { display: none; }
 
-    /* Search: allow shrinking */
-    .search-wrap {
-        min-width: 0;
-        flex-shrink: 1;
-    }
-
-    /* Header right: no wrapping, compact */
+    /* Row 1 right: Wishlist + Cart */
     .header-right {
-        gap: 6px;
+        order: 2;
         flex-shrink: 0;
+        gap: 8px;
         flex-wrap: nowrap;
+        align-items: center;
     }
+    .btn-admin         { display: none; }
+    .btn-order-history { display: none; }
 
-    /* Cart button: icon-only, circular */
     .btn-cart-trigger {
-        padding: 8px 10px;
-        border-radius: 50%;
-        min-width: 40px;
-        height: 40px;
-        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 22px;
+        gap: 5px;
     }
+    /* Hide "cart" text label, keep icon + badge */
+    .btn-cart-trigger span:nth-child(2) { display: none; }
 
-    /* Wishlist button: ensure minimum tap target */
     .btn-wishlist-trigger {
-        min-width: 40px;
         width: 40px;
         height: 40px;
+        min-width: 40px;
+    }
+
+    /* Row 2: Search bar — full width */
+    .search-wrap {
+        order: 3;
+        flex: 0 0 100%;
+        width: 100%;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.18);
+        padding: 0 12px;
+    }
+    .search-wrap input {
+        font-size: 14px;
+        padding: 8px 0;
     }
 
     /* ─────────────────────────────────────────
        LAYOUT & SECTIONS
        ───────────────────────────────────────── */
+
+    /* Taller header means more top offset for sticky sidebar */
     .layout {
         padding: 8px 8px;
+    }
+
+    /* Override body bottom padding for mobile (bottom bar is ~62px) */
+    body {
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     /* Allow main content to shrink without overflow */
@@ -674,24 +758,29 @@ select {
         font-size: 18px;
     }
 
-    /* ─────────────────────────────────────────
-       TOAST NOTIFICATIONS — word wrap on mobile
-       ───────────────────────────────────────── */
+    /* -----------------------------------------
+       TOAST NOTIFICATIONS — visible above bottom bar
+       ----------------------------------------- */
     .toast-container {
-        width: calc(100% - 32px);
-        left: 16px;
-        right: 16px;
+        width: calc(100% - 24px);
+        left: 12px;
+        right: 12px;
         transform: none;
-        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+        /* Always above the 68px bottom bar + safe area */
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+        z-index: 9999 !important;
+        pointer-events: none;
     }
 
     .toast {
-        white-space: normal;          /* allow word wrap */
+        white-space: normal;
         word-break: break-word;
         text-align: center;
         border-radius: 14px;
         padding: 12px 18px;
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.35);
     }
 
     /* ─────────────────────────────────────────
