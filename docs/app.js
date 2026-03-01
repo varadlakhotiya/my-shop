@@ -1083,7 +1083,7 @@ function renderHomePageSections() {
     renderTestimonials();
     renderGallery();
     // Hide them from main view
-    ['popular-section','why-us-section','about-section','brands-section','testimonials-section','gallery-section'].forEach(id => {
+    ['popular-section','why-us-section','about-section','brands-section','testimonials-section'].forEach(id => {  // gallery stays visible
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
     });
@@ -1327,17 +1327,10 @@ const GALLERY_ITEMS = [
 function renderGallery() {
     const el = document.getElementById('gallery-section');
     if (!el) return;
-    // Hidden section stores carousel data — popup will build the real carousel
-    el.innerHTML = `<div class="gallery-data" data-count="${GALLERY_ITEMS.length}"></div>`;
-    GALLERY_ITEMS.forEach((item, i) => {
-        const d = document.createElement('div');
-        d.className = 'gallery-data-item';
-        d.dataset.emoji = item.emoji;
-        d.dataset.mr    = item.mr;
-        d.dataset.en    = item.en;
-        d.dataset.bg    = item.bg;
-        el.querySelector('.gallery-data').appendChild(d);
-    });
+    // Render the full carousel inline (was previously only in popup)
+    el.innerHTML = buildGalleryCarousel();
+    // Delay init so DOM is ready
+    setTimeout(initGalleryCarousel, 50);
 }
 
 function buildGalleryCarousel() {
@@ -1745,7 +1738,16 @@ function openSectionPopup(key) {
         if (key === "about") sourceSection = document.getElementById("about-section");
         if (key === "brands") sourceSection = document.getElementById("brands-section");
         if (key === "testimonials") sourceSection = document.getElementById("testimonials-section");
-        if (key === "gallery") sourceSection = document.getElementById("gallery-section");
+
+        // Gallery is special: the section holds only hidden data-attrs.
+        // The real carousel HTML is built by buildGalleryCarousel().
+        if (key === "gallery") {
+            content.innerHTML = buildGalleryCarousel();
+            modal.classList.add("open");
+            document.body.style.overflow = "hidden";
+            initGalleryCarousel();
+            return;
+        }
 
         if (!sourceSection) {
             content.innerHTML = "<div style='padding:20px'>Content not available.</div>";
