@@ -1083,7 +1083,7 @@ function renderHomePageSections() {
     renderTestimonials();
     renderGallery();
     // Hide them from main view
-    ['popular-section','why-us-section','about-section','brands-section','testimonials-section'].forEach(id => {  // gallery stays visible
+    ['popular-section','why-us-section','about-section','brands-section','testimonials-section','gallery-section'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
     });
@@ -1327,10 +1327,17 @@ const GALLERY_ITEMS = [
 function renderGallery() {
     const el = document.getElementById('gallery-section');
     if (!el) return;
-    // Render the full carousel inline (was previously only in popup)
-    el.innerHTML = buildGalleryCarousel();
-    // Delay init so DOM is ready
-    setTimeout(initGalleryCarousel, 50);
+    // Store hidden data only — carousel renders in the popup via openSectionPopup('gallery')
+    el.innerHTML = `<div class="gallery-data" data-count="${GALLERY_ITEMS.length}"></div>`;
+    GALLERY_ITEMS.forEach((item, i) => {
+        const d = document.createElement('div');
+        d.className = 'gallery-data-item';
+        d.dataset.emoji = item.emoji;
+        d.dataset.mr    = item.mr;
+        d.dataset.en    = item.en;
+        d.dataset.bg    = item.bg;
+        el.querySelector('.gallery-data').appendChild(d);
+    });
 }
 
 function buildGalleryCarousel() {
