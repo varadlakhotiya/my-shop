@@ -1837,3 +1837,30 @@ body {
     border-top: 1px solid rgba(255,255,255,.1); padding: 16px 24px;
     text-align: center; font-size: 12px; color: rgba(255,255,255,.35);
 }
+
+/* hide backdrop/modal by default */
+.modal-backdrop,
+.modal,
+.backdrop,
+.overlay {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* show when explicitly open */
+.modal-backdrop.open,
+.modal.open,
+.overlay.open,
+.backdrop.open {
+  display: flex !important;       /* or block depending on layout */
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* prevent body scroll when modal open */
+body.modal-open {
+  overflow: hidden;
+}

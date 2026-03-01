@@ -114,6 +114,36 @@ const PICKUP_SLOTS = [
     { id: 's5', label: '6:00 PM – 8:00 PM',    mr: 'संध्याकाळी ६ – ८' },
 ];
 
+// === SAFETY: Force-close any stray modals/overlays ===
+function forceCloseAllModals() {
+  try {
+    // remove modal-open body state
+    document.body.classList.remove('modal-open');
+
+    // hide common modal/backdrop classes used in your markup
+    document.querySelectorAll('.modal-backdrop, .modal, .overlay, .backdrop, .modal-box').forEach(el => {
+      // remove any 'open' class and force-hide
+      el.classList.remove('open');
+      el.style.display = 'none';
+      el.style.visibility = 'hidden';
+      el.style.opacity = '0';
+    });
+
+    // call close handlers if they exist (safe-guard)
+    ['closeOtpModal','closeCheckout','closeProductModal','closeSuccess','closeWishlist','closeSectionPopup','closeCart'].forEach(fnName => {
+      if (typeof window[fnName] === 'function') {
+        try { window[fnName](); } catch(e) { /* ignore */ }
+      }
+    });
+
+    console.info('forceCloseAllModals: all modal/backdrops hidden');
+  } catch (e) {
+    console.warn('forceCloseAllModals error', e);
+  }
+}
+
+
+
 /* ══════════════════════════════════════════════
    BOOT
    ══════════════════════════════════════════════ */
@@ -161,7 +191,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // Check server + load data
     const ok = await checkServer();
-    if (!ok) return;
+    if (!ok) {
+        // running in static/offline mode — ensure no stray modal overlay remains
+        forceCloseAllModals();
+        // optionally show a simple banner instead of a modal
+        showFatalError('Server unavailable — running in offline mode',
+            'The site is running as a static frontend. Product data should still load from <code>products.json</code>.');
+        return;
+    }
 
     await loadCategories();
     await loadProducts();
@@ -1681,3 +1718,8 @@ function closeSectionPopup() {
     if (modal) modal.classList.remove('open');
     document.querySelectorAll('.info-sidebar-btn, .mob-info-btn').forEach(b => b.classList.remove('active'));
 }
+
+// After initial rendering — ensure no modal overlay stuck open:
+setTimeout(() => {
+  forceCloseAllModals();
+}, 250); // run shortly after boot to clear any late-opens
