@@ -6,12 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===================== THEME ===================== */
 :root{
   --primary:#1b5e20;
-  --accent:#f57c00;
   --bg:#f4f6f4;
-  --card:#ffffff;
+  --card:#fff;
   --border:#e0e0e0;
   --success:#2e7d32;
   --warn:#e65100;
@@ -22,25 +20,21 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:#212121}
 
-/* ===================== HEADER ===================== */
 header{
   background:var(--primary);
   color:#fff;
   padding:14px 22px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  box-shadow:0 2px 8px rgba(0,0,0,.25)
+  align-items:center;
 }
 header h1{font-size:18px}
 header a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.4);padding:6px 14px;border-radius:20px}
 
-/* ===================== LAYOUT ===================== */
 .wrap{max-width:1300px;margin:24px auto;padding:0 16px}
-.section{margin-bottom:30px}
-.section h2{font-size:18px;color:var(--primary);margin-bottom:14px}
+.section{margin-bottom:28px}
+.section h2{font-size:18px;color:var(--primary);margin-bottom:12px}
 
-/* ===================== CARDS ===================== */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .card{
   background:var(--card);
@@ -52,42 +46,29 @@ header a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.4);p
 .card .val{font-size:28px;font-weight:800;color:var(--primary)}
 .card .lbl{font-size:13px;color:#777}
 
-/* ===================== TABLE ===================== */
 table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
 thead{background:var(--primary);color:#fff}
 th,td{padding:12px 14px;font-size:14px;border-bottom:1px solid #f0f0f0;vertical-align:top}
 th{font-weight:600}
 tr:hover{background:#f9fbe7}
+
 .badge{padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700}
 .pending{background:#fff3e0;color:#e65100}
 .confirmed{background:#e8f5e9;color:#2e7d32}
 .delivered{background:#e3f2fd;color:#1565c0}
 .cancelled{background:#fce4ec;color:#c62828}
 
-/* ===================== INPUTS ===================== */
 input,select{
   padding:6px 10px;
   border:1px solid var(--border);
   border-radius:6px;
   font-size:13px
 }
-button{
-  background:var(--primary);
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  padding:6px 12px;
-  cursor:pointer;
-  font-size:13px
-}
-button.secondary{background:#eee;color:#333}
-button.warn{background:var(--warn)}
-button.danger{background:var(--danger)}
 
-.items{font-size:12px;color:#555;line-height:1.7;margin-top:6px}
+.items{font-size:12px;color:#555;line-height:1.7}
 .empty{padding:40px;text-align:center;color:#9e9e9e}
 
-/* ===================== ADMIN GATE ===================== */
+/* ADMIN GATE */
 #gate{
   position:fixed;inset:0;z-index:9999;
   background:linear-gradient(135deg,#1b5e20,#2e7d32);
@@ -101,16 +82,21 @@ button.danger{background:var(--danger)}
 
 <body>
 
-<!-- ===================== ADMIN PASSWORD ===================== -->
+<!-- ADMIN LOGIN -->
 <div id="gate">
   <div id="gate-box">
     <h2 style="color:#1b5e20">🔐 Admin Login</h2>
     <p style="font-size:13px;color:#777;margin:10px 0 20px">Gajanan Trading Co.</p>
-    <input id="pass" type="password" placeholder="Admin Password"
+    <input id="admin-pass" type="password" placeholder="Admin Password"
       style="width:100%;padding:12px;text-align:center"
-      onkeydown="if(event.key==='Enter') login()">
-    <p id="err" style="display:none;color:#c62828;font-size:13px;margin-top:8px">Wrong password</p>
-    <button onclick="login()" style="margin-top:14px;width:100%">Enter Admin</button>
+      onkeydown="if(event.key==='Enter') loginAdmin()">
+    <p id="login-error" style="display:none;color:#c62828;font-size:13px;margin-top:8px">
+      Wrong password
+    </p>
+    <button onclick="loginAdmin()" style="margin-top:14px;width:100%;padding:12px;
+      background:#1b5e20;color:#fff;border:none;border-radius:8px;font-weight:700">
+      Enter Admin
+    </button>
   </div>
 </div>
 
@@ -121,7 +107,7 @@ button.danger{background:var(--danger)}
 
 <div class="wrap">
 
-  <!-- ===================== STATS ===================== -->
+  <!-- STATS -->
   <div class="section">
     <div class="cards">
       <div class="card"><div class="val" id="stat-orders">—</div><div class="lbl">Total Orders</div></div>
@@ -130,25 +116,25 @@ button.danger{background:var(--danger)}
     </div>
   </div>
 
-  <!-- ===================== DAILY REPORT ===================== -->
+  <!-- DAILY REPORT -->
   <div class="section">
-    <h2>📊 Daily Sales Report</h2>
-    <div id="daily-report" class="card empty">No data yet</div>
+    <h2>📊 Daily Sales</h2>
+    <div id="daily-report" class="card empty">No orders today</div>
   </div>
 
-  <!-- ===================== LOW STOCK ===================== -->
+  <!-- LOW STOCK -->
   <div class="section">
     <h2>⚠️ Low Stock Alerts</h2>
     <div id="low-stock" class="card empty">Products not added yet</div>
   </div>
 
-  <!-- ===================== PRODUCT MGMT ===================== -->
+  <!-- PRODUCTS -->
   <div class="section">
     <h2>🏪 Product Management</h2>
     <div id="product-mgmt" class="empty">Products not added yet</div>
   </div>
 
-  <!-- ===================== ORDERS ===================== -->
+  <!-- ORDERS -->
   <div class="section">
     <h2>📋 Orders</h2>
     <div id="orders-wrap"></div>
@@ -157,94 +143,136 @@ button.danger{background:var(--danger)}
 </div>
 
 <script>
-/* ===================== CONFIG ===================== */
-const ADMIN_PASSWORD="gajanan123";
-const DB="https://my-shop-orders-a863e-default-rtdb.firebaseio.com";
+/* ================= CONFIG ================= */
+const ADMIN_PASSWORD = "gajanan123";
+const DB = "https://my-shop-orders-a863e-default-rtdb.firebaseio.com";
 
-/* ===================== AUTH ===================== */
-if(sessionStorage.getItem("admin")==="yes")
+/* ================= LOGIN ================= */
+if(sessionStorage.getItem("admin_auth")==="yes"){
   document.getElementById("gate").style.display="none";
-
-function login(){
-  if(pass.value===ADMIN_PASSWORD){
-    sessionStorage.setItem("admin","yes");
-    gate.style.display="none";
-  }else err.style.display="block";
 }
 
-/* ===================== LOAD DATA ===================== */
-let orders=[], products=[];
+function loginAdmin(){
+  const pass = document.getElementById("admin-pass");
+  const err  = document.getElementById("login-error");
 
-fetch(DB+"/orders.json").then(r=>r.json()).then(d=>{
-  if(d){
-    orders=Object.entries(d).map(([id,o])=>({id,...o}));
-    renderStats();
-    renderOrders();
-    renderDaily();
+  if(pass.value === ADMIN_PASSWORD){
+    sessionStorage.setItem("admin_auth","yes");
+    document.getElementById("gate").style.display="none";
+  }else{
+    err.style.display="block";
   }
+}
+
+/* ================= DATA ================= */
+let orders = [];
+let products = [];
+
+/* LOAD ORDERS */
+fetch(DB + "/orders.json")
+.then(r => r.json())
+.then(data => {
+  if(!data) return;
+  orders = Object.entries(data).map(([id,o]) => ({id, ...o}));
+  renderStats();
+  renderOrders();
+  renderDaily();
 });
 
-fetch(DB+"/products.json").then(r=>r.json()).then(d=>{
-  if(d){
-    products=Object.entries(d).map(([id,p])=>({id,...p}));
-    renderProducts();
-    renderLowStock();
-  }
+/* LOAD PRODUCTS (future-ready) */
+fetch(DB + "/products.json")
+.then(r => r.json())
+.then(data => {
+  if(!data) return;
+  products = Object.entries(data).map(([id,p]) => ({id, ...p}));
+  renderLowStock();
+  renderProducts();
 });
 
-/* ===================== STATS ===================== */
+/* ================= STATS ================= */
 function renderStats(){
-  stat-orders.textContent=orders.length;
-  stat-pending.textContent=orders.filter(o=>o.status==="pending").length;
-  stat-revenue.textContent="₹"+orders.reduce((s,o)=>s+(o.total||0),0).toFixed(0);
+  document.getElementById("stat-orders").textContent = orders.length;
+  document.getElementById("stat-pending").textContent =
+    orders.filter(o => o.status === "pending").length;
+  document.getElementById("stat-revenue").textContent =
+    "₹" + orders.reduce((s,o)=>s+(o.total||0),0).toFixed(0);
 }
 
-/* ===================== ORDERS ===================== */
+/* ================= ORDERS ================= */
 function renderOrders(){
+  const wrap = document.getElementById("orders-wrap");
   if(!orders.length){
-    orders-wrap.innerHTML='<div class="empty">No orders yet</div>';return;
+    wrap.innerHTML = '<div class="empty">No orders yet</div>';
+    return;
   }
-  let h='<table><thead><tr><th>#</th><th>Customer</th><th>Status</th><th>Total</th><th>Items</th></tr></thead><tbody>';
+
+  let html = `
+  <table>
+    <thead>
+      <tr>
+        <th>Order</th>
+        <th>Customer</th>
+        <th>Status</th>
+        <th>Total</th>
+        <th>Items</th>
+      </tr>
+    </thead><tbody>`;
+
   orders.forEach(o=>{
-    h+=`<tr>
-      <td>${o.order_number||o.id}</td>
-      <td>${o.customer?.name}<br>${o.customer?.phone}</td>
+    html += `
+    <tr>
+      <td>${o.order_number || o.id}</td>
       <td>
-        <span class="badge ${o.status||'pending'}">${o.status||'pending'}</span><br><br>
-        <select onchange="updateStatus('${o.id}',this.value)">
-          ${["pending","confirmed","delivered","cancelled"].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`)}
+        <strong>${o.customer?.name || "-"}</strong><br>
+        📞 ${o.customer?.phone || ""}
+      </td>
+      <td>
+        <span class="badge ${o.status||"pending"}">${o.status||"pending"}</span><br><br>
+        <select onchange="updateStatus('${o.id}', this.value)">
+          ${["pending","confirmed","delivered","cancelled"]
+            .map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${s}</option>`).join("")}
         </select>
       </td>
-      <td>₹${(o.total||0).toFixed(2)}</td>
-      <td class="items">${(o.cart||[]).map(i=>`• ${i.name_marathi||i.name} — ${i.quantity}${i.unit}`).join("<br>")}</td>
+      <td><strong>₹${(o.total||0).toFixed(2)}</strong></td>
+      <td class="items">
+        ${(o.cart||[]).map(i =>
+          `• ${i.name_marathi||i.name} — ${i.quantity} ${i.unit}`
+        ).join("<br>")}
+      </td>
     </tr>`;
   });
-  orders-wrap.innerHTML=h+"</tbody></table>";
-}
-function updateStatus(id,s){
-  fetch(`${DB}/orders/${id}/status.json`,{method:"PUT",body:JSON.stringify(s)});
+
+  wrap.innerHTML = html + "</tbody></table>";
 }
 
-/* ===================== DAILY REPORT ===================== */
+function updateStatus(id, status){
+  fetch(`${DB}/orders/${id}/status.json`,{
+    method:"PUT",
+    body:JSON.stringify(status)
+  });
+}
+
+/* ================= DAILY ================= */
 function renderDaily(){
-  const today=new Date().toDateString();
-  const t=orders.filter(o=>new Date(o.created_at||0).toDateString()===today);
-  daily-report.innerHTML=t.length
-    ? `<strong>${t.length}</strong> orders today — ₹${t.reduce((s,o)=>s+(o.total||0),0).toFixed(0)}`
-    : "No orders today";
+  const today = new Date().toDateString();
+  const todayOrders = orders.filter(o =>
+    new Date(o.created_at || 0).toDateString() === today
+  );
+  document.getElementById("daily-report").innerHTML =
+    todayOrders.length
+      ? `<strong>${todayOrders.length}</strong> orders today — ₹${todayOrders.reduce((s,o)=>s+(o.total||0),0).toFixed(0)}`
+      : "No orders today";
 }
 
-/* ===================== PRODUCTS ===================== */
+/* ================= PRODUCTS ================= */
 function renderProducts(){
-  product-mgmt.innerHTML=products.length
-    ? "Product management active"
-    : "Products not added yet";
+  document.getElementById("product-mgmt").innerHTML =
+    products.length ? "Product management ready" : "Products not added yet";
 }
 function renderLowStock(){
-  const low=products.filter(p=>p.stock<5);
-  low-stock.innerHTML=low.length
-    ? low.map(p=>`${p.name} (${p.stock})`).join("<br>")
-    : "All stocks healthy";
+  const low = products.filter(p => p.stock < 5);
+  document.getElementById("low-stock").innerHTML =
+    low.length ? low.map(p=>`${p.name} (${p.stock})`).join("<br>") : "All stocks healthy";
 }
 </script>
 
