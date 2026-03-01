@@ -716,6 +716,7 @@ function clearOtpError() {
 }
 
 let otpCountdownTimer = null;
+let _clientOtp = null; // stores the generated OTP for client-side verification
 
 async function sendOtp() {
     clearOtpError();
@@ -729,39 +730,35 @@ async function sendOtp() {
     btn.disabled = true;
     btn.textContent = 'Sending...';
 
-    try {
-        const res  = await fetch('/api/otp/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone })
-        });
-        const data = await res.json();
+    // ── CLIENT-SIDE OTP (no server needed for static/GitHub Pages hosting) ──
+    // Generate a random 6-digit OTP locally and display it.
+    // Since there's no SMS backend, the OTP is shown as a toast below.
+    // To add real SMS later: replace this block with a call to your SMS API.
+    _clientOtp = String(Math.floor(100000 + Math.random() * 900000));
 
-        if (!data.success) {
-            setOtpError(data.message);
-            btn.disabled = false;
-            btn.textContent = 'OTP पाठवा (Send OTP)';
-            return;
-        }
+    // Show step 2
+    showOtpStep(2);
+    document.getElementById('otp-sent-phone').textContent = phone;
 
-        // Show step 2
-        showOtpStep(2);
-        document.getElementById('otp-sent-phone').textContent = phone;
+    // Show OTP to user (since we have no SMS service on static hosting)
+    showToast(`🔑 तुमचा OTP: ${_clientOtp}`, 'success');
 
-        // ⚠️ DEV MODE: show OTP in a toast so you can test without SMS.
-        //    Remove this block in production after integrating real SMS.
-        if (data.dev_otp) {
-            showToast(`🔑 Dev OTP: ${data.dev_otp}`, 'success');
-        }
-
-        // Start 30-second resend countdown
-        startResendCountdown();
-
-    } catch (e) {
-        setOtpError('सर्व्हर त्रुटी (Server error): ' + e.message);
-        btn.disabled = false;
-        btn.textContent = 'OTP पाठवा (Send OTP)';
+    // Also show it prominently inside the modal so it's easy to read
+    const step2 = document.getElementById('otp-step-2');
+    let otpDisplay = step2 && step2.querySelector('#otp-display-box');
+    if (step2 && !otpDisplay) {
+        otpDisplay = document.createElement('div');
+        otpDisplay.id = 'otp-display-box';
+        otpDisplay.style.cssText = 'background:#e8f5e9;border:2px solid #4caf50;border-radius:10px;padding:14px;text-align:center;margin:12px 0;font-size:28px;font-weight:800;letter-spacing:6px;color:#1b5e20';
+        step2.insertBefore(otpDisplay, step2.firstChild);
     }
+    if (otpDisplay) otpDisplay.textContent = _clientOtp;
+
+    // Start 30-second resend countdown
+    startResendCountdown();
+
+    btn.disabled = false;
+    btn.textContent = 'OTP पाठवा (Send OTP)';
 }
 
 function startResendCountdown() {
@@ -801,33 +798,22 @@ async function verifyOtp() {
     const btn = document.getElementById('btn-verify-otp');
     if (btn) { btn.disabled = true; btn.textContent = 'Verifying...'; }
 
-    try {
-        const res  = await fetch('/api/otp/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, otp })
-        });
-        const data = await res.json();
-
-        if (!data.success) {
-            setOtpError(data.message);
-            if (btn) { btn.disabled = false; btn.textContent = 'OTP तपासा (Verify OTP)'; }
-            const otpInput = document.getElementById('otp-input');
-            if (otpInput) { otpInput.value = ''; otpInput.focus(); }
-            return;
-        }
-
-        // OTP verified!
-        verifiedPhone = phone;
-        if (otpCountdownTimer) clearInterval(otpCountdownTimer);
-        closeOtpModal();
-        showToast('✅ मोबाइल क्रमांक तपासला! (Phone verified!)', 'success');
-        showCheckoutForm();
-
-    } catch (e) {
-        setOtpError('सर्व्हर त्रुटी (Server error): ' + e.message);
+    // ── CLIENT-SIDE VERIFICATION (no server needed) ──
+    if (!_clientOtp || otp !== _clientOtp) {
+        setOtpError('चुकीचा OTP! कृपया पुन्हा प्रयत्न करा (Wrong OTP, please try again)');
         if (btn) { btn.disabled = false; btn.textContent = 'OTP तपासा (Verify OTP)'; }
+        const otpInput = document.getElementById('otp-input');
+        if (otpInput) { otpInput.value = ''; otpInput.focus(); }
+        return;
     }
+
+    // OTP verified!
+    _clientOtp    = null; // clear after use
+    verifiedPhone = phone;
+    if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+    closeOtpModal();
+    showToast('✅ मोबाइल क्रमांक तपासला! (Phone verified!)', 'success');
+    showCheckoutForm();
 }
 
 /* ══════════════════════════════════════════════
