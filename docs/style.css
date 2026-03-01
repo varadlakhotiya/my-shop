@@ -870,6 +870,8 @@ body {
 }
 
 
+/* ══════════════════════════════════════════════
+   RESPONSIVE — TABLET (≤ 900px)
    ══════════════════════════════════════════════ */
 @media (max-width: 900px) {
     /* Hide right info sidebar — accessed via bottom bar instead */

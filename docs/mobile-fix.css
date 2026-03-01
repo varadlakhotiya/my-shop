@@ -1,0 +1,932 @@
+/* ══════════════════════════════════════════════════════════════
+   GAJANAN TRADING — MOBILE RESPONSIVE FIX
+   Add this AFTER style.css in index.html:
+       <link rel="stylesheet" href="mobile-fix.css">
+
+   WHAT THIS FILE FIXES:
+   ─────────────────────
+   1.  Root overflow fix  → prevents horizontal scroll on all phones
+   2.  Global media rules → images & iframes never overflow
+   3.  Header overflow    → compact layout on ≤ 400px phones
+   4.  Hero section       → properly collapses to single column
+   5.  Toast messages     → word-wrap, no off-screen overflow
+   6.  Wishlist badge     → display: flex was missing
+   7.  Inputs             → font-size 16px stops iOS auto-zoom
+   8.  Bottom bar         → safe-area-inset for iPhone notch/home bar
+   9.  Cart sidebar       → full-width with safe area on iPhone
+   10. Modal backdrops    → align-items: flex-end bottom-sheet on mobile
+   11. Location map       → responsive height on small screens
+   12. Checkout form      → horizontal scroll inside modals fixed
+   13. Touch targets      → all buttons ≥ 44px (Apple HIG standard)
+   14. Scroll quality     → -webkit-overflow-scrolling: touch
+   15. Tab bar overlap    → content never hidden behind bottom bar
+   ══════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════
+   1. ROOT OVERFLOW FIX — THE #1 MOBILE KILLER
+   ══════════════════════════════════════════════ */
+html {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%; /* stop iOS font boosting */
+}
+
+body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ══════════════════════════════════════════════
+   2. GLOBAL MEDIA CONTAINMENT
+   ══════════════════════════════════════════════ */
+img,
+video,
+iframe,
+embed,
+object {
+    max-width: 100%;
+}
+
+/* Iframes need explicit width reset too */
+iframe {
+    display: block;
+    width: 100%;
+}
+
+/* Prevent pre/code blocks from blowing out layout */
+pre, code {
+    overflow-x: auto;
+    word-break: break-word;
+}
+
+/* ══════════════════════════════════════════════
+   3. WISHLIST BADGE — was missing display: flex
+   ══════════════════════════════════════════════ */
+.wish-badge {
+    display: flex !important; /* was missing, causing badge to not center */
+}
+
+
+/* ══════════════════════════════════════════════
+   4. LOCATION MAP — fully responsive
+   ══════════════════════════════════════════════ */
+.location-map {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.location-map iframe {
+    width: 100% !important;   /* override any inline width */
+    height: 320px;
+    border-radius: 12px;
+    border: 0;
+    display: block;
+}
+
+
+/* ══════════════════════════════════════════════
+   5. PREVENT iOS ZOOM ON FORM INPUTS
+      (iOS zooms in when input font-size < 16px)
+   ══════════════════════════════════════════════ */
+input[type="text"],
+input[type="tel"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    font-size: 16px !important;
+}
+
+
+/* ══════════════════════════════════════════════
+   TABLET (≤ 900px) — minor tweaks on top of existing
+   ══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+
+    /* ── Bottom bar safe area (notch phones) ── */
+    #mobile-info-bar {
+        padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body {
+        padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ── Scrollable areas: smooth momentum on iOS ── */
+    #sidebar-categories,
+    .cart-items-list,
+    .modal-box,
+    .wishlist-items,
+    #oh-results {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Location map height on tablet ── */
+    .location-map iframe {
+        height: 260px;
+    }
+}
+
+
+/* ══════════════════════════════════════════════
+   MOBILE (≤ 600px) — All critical mobile fixes
+   ══════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+    /* ─────────────────────────────────────────
+       HEADER — prevent overflow on small phones
+       ───────────────────────────────────────── */
+    .header-inner {
+        gap: 6px;
+        padding: 0 10px;
+    }
+
+    /* Logo: shrink for small screens */
+    .logo-area {
+        flex-shrink: 1;
+        min-width: 0;
+    }
+    .logo-en {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+    }
+
+    /* Search: allow shrinking */
+    .search-wrap {
+        min-width: 0;
+        flex-shrink: 1;
+    }
+
+    /* Header right: no wrapping, compact */
+    .header-right {
+        gap: 6px;
+        flex-shrink: 0;
+        flex-wrap: nowrap;
+    }
+
+    /* Cart button: icon-only, circular */
+    .btn-cart-trigger {
+        padding: 8px 10px;
+        border-radius: 50%;
+        min-width: 40px;
+        height: 40px;
+        justify-content: center;
+    }
+
+    /* Wishlist button: ensure minimum tap target */
+    .btn-wishlist-trigger {
+        min-width: 40px;
+        width: 40px;
+        height: 40px;
+    }
+
+    /* ─────────────────────────────────────────
+       LAYOUT & SECTIONS
+       ───────────────────────────────────────── */
+    .layout {
+        padding: 8px 8px;
+    }
+
+    /* Allow main content to shrink without overflow */
+    #main-content {
+        min-width: 0;
+        width: 100%;
+    }
+
+    /* All home sections: don't let internal content overflow */
+    .home-section {
+        overflow: hidden;
+    }
+
+    /* ─────────────────────────────────────────
+       HERO SECTION — single column
+       ───────────────────────────────────────── */
+    .hero-section {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 22px 16px !important;
+        gap: 0 !important;
+    }
+
+    .hero-top {
+        min-width: 0 !important;
+        width: 100%;
+    }
+
+    .hero-visual {
+        display: none !important;
+    }
+
+    .hero-mr {
+        font-size: 22px;
+    }
+
+    .hero-en {
+        font-size: 13px;
+    }
+
+    .hero-cta-row {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .hero-btn-primary,
+    .hero-btn-secondary {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        justify-content: center;
+        padding: 11px 12px;
+        font-size: 13px;
+    }
+
+    .hero-stats {
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .hero-stat strong {
+        font-size: 20px;
+    }
+
+    /* ─────────────────────────────────────────
+       HORIZONTAL SCROLL CARDS (Popular / Buy Again)
+       ───────────────────────────────────────── */
+    .hscroll-track {
+        /* Prevent the track itself from causing page overflow */
+        overflow-x: auto;
+        overflow-y: visible;
+        padding-bottom: 8px;
+        /* Contain within parent */
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .hscroll-card {
+        width: 128px;
+        padding: 12px 8px;
+        flex-shrink: 0;
+    }
+
+    /* ─────────────────────────────────────────
+       SECTION HEADINGS — no overflow
+       ───────────────────────────────────────── */
+    .section-head {
+        flex-wrap: wrap;
+    }
+
+    .section-head-text {
+        min-width: 0;
+    }
+
+    .section-title-mr {
+        font-size: 16px;
+        word-break: break-word;
+    }
+
+    /* ─────────────────────────────────────────
+       PRODUCT CARDS
+       ───────────────────────────────────────── */
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .product-card {
+        min-width: 0; /* allow grid cell to shrink */
+    }
+
+    .product-img {
+        height: 110px;
+        font-size: 38px;
+    }
+
+    .product-body {
+        padding: 8px;
+        gap: 3px;
+    }
+
+    .product-name-marathi {
+        font-size: 12px;
+        word-break: break-word;
+    }
+
+    .product-name-english {
+        font-size: 11px;
+    }
+
+    .product-price {
+        font-size: 14px;
+    }
+
+    .add-btn {
+        font-size: 12px;
+        padding: 9px 6px;
+        min-height: 36px; /* touch target */
+    }
+
+    /* ─────────────────────────────────────────
+       CATEGORY GRID
+       ───────────────────────────────────────── */
+    .cat-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .cat-card {
+        padding: 14px 6px;
+        min-width: 0;
+    }
+
+    .cat-card-icon {
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+
+    .cat-card-name-mar {
+        font-size: 11px;
+    }
+
+    .cat-card-name-eng {
+        font-size: 10px;
+    }
+
+    /* ─────────────────────────────────────────
+       CART SIDEBAR — full width on mobile
+       ───────────────────────────────────────── */
+    .cart-sidebar {
+        width: 100%;
+        right: -100%;
+        /* Safe area for notched iPhones */
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .cart-sidebar.open {
+        right: 0;
+    }
+
+    /* Enough room above bottom bar */
+    .cart-footer {
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ─────────────────────────────────────────
+       MODALS — bottom-sheet style on mobile
+       ───────────────────────────────────────── */
+    .modal-backdrop {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    .modal-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 92vh;
+        border-radius: 20px 20px 0 0 !important;
+        padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+        overflow-y: auto;
+        overflow-x: hidden; /* CRITICAL — no horizontal scroll inside modal */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Section popup stays centered, not bottom-sheet */
+    .modal-backdrop:has(.section-popup-box) {
+        align-items: center !important;
+        padding: 16px !important;
+    }
+
+    .section-popup-box {
+        border-radius: 16px !important;
+        max-height: 88vh;
+        padding: 18px 14px 24px !important;
+        width: 95% !important;
+        align-self: center;
+        overflow-x: hidden;
+    }
+
+    /* Modal close button — larger tap target */
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #f5f5f5;
+        font-size: 18px;
+        top: 12px;
+        right: 12px;
+    }
+
+    /* Product modal header wraps on small screens */
+    .modal-product-header {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-right: 40px; /* room for close btn */
+    }
+
+    .modal-emoji {
+        font-size: 36px;
+    }
+
+    .modal-name {
+        font-size: 15px;
+        word-break: break-word;
+    }
+
+    /* Quantity chips — wrap without overflow */
+    .qty-chips {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .qty-opt-btn {
+        padding: 8px 14px;
+        font-size: 13px;
+        min-height: 40px; /* touch target */
+    }
+
+    /* Custom qty row */
+    .custom-qty-row {
+        flex-wrap: wrap;
+    }
+
+    .custom-qty-row input {
+        min-width: 80px;
+    }
+
+    /* ─────────────────────────────────────────
+       CHECKOUT MODAL
+       ───────────────────────────────────────── */
+    .modal-checkout {
+        max-width: 100%;
+    }
+
+    .checkout-form input,
+    .checkout-form textarea {
+        /* Already 16px from global rule, but ensure full-width */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .pickup-slots {
+        max-height: 220px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ─────────────────────────────────────────
+       OTP MODAL
+       ───────────────────────────────────────── */
+    .modal-otp {
+        padding: 24px 16px !important;
+    }
+
+    .otp-phone-row {
+        flex-wrap: nowrap; /* keep +91 and input side-by-side */
+    }
+
+    /* ─────────────────────────────────────────
+       ORDER HISTORY MODAL — search bar fix
+       ───────────────────────────────────────── */
+    #oh-search-section > div {
+        flex-wrap: nowrap;
+        gap: 6px;
+    }
+
+    #oh-search-section input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    #oh-search-section button {
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    /* ─────────────────────────────────────────
+       LOCATION MAP — smaller height on phones
+       ───────────────────────────────────────── */
+    .location-map iframe {
+        height: 200px !important;
+        border-radius: 10px;
+    }
+
+    .location-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .loc-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .loc-btn {
+        width: 100%;
+        text-align: center;
+        padding: 13px;
+        min-height: 48px; /* touch target */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ─────────────────────────────────────────
+       WHY US SECTION
+       ───────────────────────────────────────── */
+    .why-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .why-card {
+        padding: 16px 10px;
+    }
+
+    .why-icon {
+        font-size: 28px;
+    }
+
+    .why-mr {
+        font-size: 13px;
+    }
+
+    .why-en {
+        font-size: 11px;
+    }
+
+    /* ─────────────────────────────────────────
+       BRANDS
+       ───────────────────────────────────────── */
+    .brands-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .brand-card {
+        padding: 14px 8px;
+    }
+
+    .brand-emoji {
+        font-size: 28px;
+    }
+
+    .brands-cta {
+        padding: 16px 14px;
+    }
+
+    .brands-contact-btn {
+        padding: 11px 14px;
+        font-size: 13px;
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
+    }
+
+    /* ─────────────────────────────────────────
+       ABOUT SECTION
+       ───────────────────────────────────────── */
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .about-photo-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .about-title-mr {
+        font-size: 20px;
+    }
+
+    .about-facts {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .about-cta-btn {
+        width: 100%;
+        text-align: center;
+        padding: 13px;
+        display: block;
+    }
+
+    /* ─────────────────────────────────────────
+       TESTIMONIALS
+       ───────────────────────────────────────── */
+    .testi-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .testi-card {
+        padding: 16px;
+    }
+
+    /* ─────────────────────────────────────────
+       GALLERY CAROUSEL
+       ───────────────────────────────────────── */
+    .gc-wrap {
+        overflow: hidden; /* prevent any spillover */
+    }
+
+    .gc-slide-inner {
+        height: 220px;
+        gap: 8px;
+        padding: 16px;
+    }
+
+    .gc-slide-emoji {
+        font-size: 52px;
+    }
+
+    .gc-slide-label-mr {
+        font-size: 16px;
+    }
+
+    .gc-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .gc-prev { margin-right: 6px; }
+    .gc-next { margin-left: 6px; }
+
+    .gc-thumbs {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .gc-thumb {
+        min-width: 68px;
+        height: 54px;
+        font-size: 18px;
+    }
+
+    /* ─────────────────────────────────────────
+       TOAST NOTIFICATIONS — word wrap on mobile
+       ───────────────────────────────────────── */
+    .toast-container {
+        width: calc(100% - 32px);
+        left: 16px;
+        right: 16px;
+        transform: none;
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .toast {
+        white-space: normal;          /* allow word wrap */
+        word-break: break-word;
+        text-align: center;
+        border-radius: 14px;
+        padding: 12px 18px;
+        font-size: 13px;
+    }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+       ───────────────────────────────────────── */
+    .site-footer {
+        margin-bottom: 0;
+    }
+
+    .footer-inner {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 16px 24px;
+    }
+
+    /* ─────────────────────────────────────────
+       PRODUCTS VIEW HEADER
+       ───────────────────────────────────────── */
+    .products-view-header {
+        gap: 10px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+
+    .products-view-header h2 {
+        font-size: 16px;
+        min-width: 0;
+    }
+
+    .btn-back {
+        padding: 9px 14px;
+        font-size: 13px;
+        min-height: 40px;
+        white-space: nowrap;
+    }
+
+    /* ─────────────────────────────────────────
+       SECTION POPUP (inside modal)
+       ───────────────────────────────────────── */
+    .section-popup-content .about-photo-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .section-popup-content .about-facts {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* ─────────────────────────────────────────
+       WISHLIST MODAL
+       ───────────────────────────────────────── */
+    .modal-wishlist {
+        max-width: 100%;
+    }
+
+    .wishlist-item {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .wishlist-actions {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .wish-add-btn,
+    .wish-remove-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    /* ─────────────────────────────────────────
+       SEARCH BANNER
+       ───────────────────────────────────────── */
+    .search-banner {
+        font-size: 13px;
+        padding: 8px 12px;
+        word-break: break-word;
+    }
+
+    /* ─────────────────────────────────────────
+       MOBILE BOTTOM INFO BAR
+       ───────────────────────────────────────── */
+    #mobile-info-bar {
+        /* Stick to very bottom, above iPhone home indicator */
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
+    }
+
+    .mob-info-btn {
+        /* Touch target minimum */
+        min-height: 48px;
+    }
+}
+
+
+/* ══════════════════════════════════════════════
+   VERY SMALL PHONES (≤ 380px)
+   ══════════════════════════════════════════════ */
+@media (max-width: 380px) {
+
+    /* Logo text: abbreviate on tiny screens */
+    .logo-en {
+        max-width: 90px;
+        font-size: 11px;
+    }
+
+    .logo-emoji {
+        font-size: 20px;
+    }
+
+    /* Category grid: 2 cols on very small */
+    .cat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Hero CTA: stack vertically */
+    .hero-cta-row {
+        flex-direction: column;
+    }
+
+    .hero-btn-primary,
+    .hero-btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Why us: single col */
+    .why-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Brands: 2 cols (already small) */
+    .brands-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Product grid stays 2 cols */
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    /* Product name: smaller */
+    .product-name-marathi {
+        font-size: 11px;
+    }
+
+    /* OTP modal: tighter padding */
+    .modal-otp {
+        padding: 20px 12px !important;
+    }
+
+    /* Checkout modal: tighter */
+    .checkout-title {
+        font-size: 16px;
+    }
+
+    /* Gallery: tiny thumb */
+    .gc-thumb {
+        min-width: 58px;
+        height: 48px;
+    }
+
+    .gc-thumb-label {
+        font-size: 8px;
+    }
+}
+
+
+/* ══════════════════════════════════════════════
+   TOUCH ENHANCEMENTS (all touch devices)
+   ══════════════════════════════════════════════ */
+@media (pointer: coarse) {
+
+    /* Remove tap highlight flash on iOS */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* All tappable buttons: minimum 44px height (Apple HIG) */
+    button,
+    .cat-item,
+    .cat-card,
+    .hscroll-card,
+    .mob-info-btn,
+    .info-sidebar-btn {
+        min-height: 44px;
+    }
+
+    /* Smooth bounce scrolling on iOS for all scrollable areas */
+    .cart-items-list,
+    .modal-box,
+    #sidebar-categories,
+    .hscroll-track,
+    .gc-thumbs,
+    .pickup-slots,
+    #oh-results {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    /* Remove hover effects on touch (they stick on iOS) */
+    .cat-card:hover,
+    .product-card:hover,
+    .why-card:hover,
+    .brand-card:hover,
+    .testi-card:hover {
+        transform: none;
+        box-shadow: var(--shadow);
+    }
+}
+
+
+/* ══════════════════════════════════════════════
+   PRINT — hide mobile chrome
+   ══════════════════════════════════════════════ */
+@media print {
+    #mobile-info-bar,
+    #main-header,
+    .cart-sidebar,
+    .cart-overlay,
+    .modal-backdrop,
+    .toast-container {
+        display: none !important;
+    }
+
+    body {
+        padding-bottom: 0 !important;
+    }
+
+    .layout {
+        display: block;
+    }
+
+    #sidebar,
+    #info-sidebar {
+        display: none;
+    }
+}
