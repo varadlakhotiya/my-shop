@@ -9,11 +9,8 @@
 :root{
   --primary:#1b5e20;
   --bg:#f4f6f4;
-  --card:#fff;
+  --card:#ffffff;
   --border:#e0e0e0;
-  --success:#2e7d32;
-  --warn:#e65100;
-  --danger:#c62828;
   --radius:10px;
   --shadow:0 2px 10px rgba(0,0,0,.08);
 }
@@ -28,29 +25,21 @@ header{
   justify-content:space-between;
   align-items:center;
 }
-header h1{font-size:18px}
-header a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.4);padding:6px 14px;border-radius:20px}
 
-.wrap{max-width:1300px;margin:24px auto;padding:0 16px}
-.section{margin-bottom:28px}
+.wrap{max-width:1200px;margin:24px auto;padding:0 16px}
+.section{margin-bottom:26px}
 .section h2{font-size:18px;color:var(--primary);margin-bottom:12px}
 
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .card{
   background:var(--card);
   border-radius:var(--radius);
   padding:18px;
-  text-align:center;
   box-shadow:var(--shadow)
 }
-.card .val{font-size:28px;font-weight:800;color:var(--primary)}
-.card .lbl{font-size:13px;color:#777}
 
-table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}
 thead{background:var(--primary);color:#fff}
-th,td{padding:12px 14px;font-size:14px;border-bottom:1px solid #f0f0f0;vertical-align:top}
-th{font-weight:600}
-tr:hover{background:#f9fbe7}
+th,td{padding:12px 14px;font-size:14px;border-bottom:1px solid #f0f0f0}
 
 .badge{padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700}
 .pending{background:#fff3e0;color:#e65100}
@@ -58,39 +47,30 @@ tr:hover{background:#f9fbe7}
 .delivered{background:#e3f2fd;color:#1565c0}
 .cancelled{background:#fce4ec;color:#c62828}
 
-input,select{
-  padding:6px 10px;
-  border:1px solid var(--border);
-  border-radius:6px;
-  font-size:13px
-}
-
-.items{font-size:12px;color:#555;line-height:1.7}
 .empty{padding:40px;text-align:center;color:#9e9e9e}
 
-/* ADMIN GATE */
+/* LOGIN GATE */
 #gate{
   position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(135deg,#1b5e20,#2e7d32);
+  background:#1b5e20;
   display:flex;align-items:center;justify-content:center
 }
 #gate-box{
-  background:#fff;padding:36px;border-radius:16px;width:360px;text-align:center
+  background:#fff;padding:36px;border-radius:16px;width:340px;text-align:center
 }
 </style>
 </head>
 
 <body>
 
-<!-- ADMIN LOGIN -->
+<!-- LOGIN -->
 <div id="gate">
   <div id="gate-box">
     <h2 style="color:#1b5e20">🔐 Admin Login</h2>
-    <p style="font-size:13px;color:#777;margin:10px 0 20px">Gajanan Trading Co.</p>
-    <input id="admin-pass" type="password" placeholder="Admin Password"
-      style="width:100%;padding:12px;text-align:center"
+    <input id="adminPass" type="password" placeholder="Admin Password"
+      style="width:100%;padding:12px;margin-top:16px;text-align:center"
       onkeydown="if(event.key==='Enter') loginAdmin()">
-    <p id="login-error" style="display:none;color:#c62828;font-size:13px;margin-top:8px">
+    <p id="loginError" style="display:none;color:#c62828;font-size:13px;margin-top:8px">
       Wrong password
     </p>
     <button onclick="loginAdmin()" style="margin-top:14px;width:100%;padding:12px;
@@ -102,42 +82,14 @@ input,select{
 
 <header>
   <h1>👨‍💼 Admin Panel</h1>
-  <a href="index.html">← Shop</a>
+  <a href="index.html" style="color:#fff">← Shop</a>
 </header>
 
 <div class="wrap">
 
-  <!-- STATS -->
-  <div class="section">
-    <div class="cards">
-      <div class="card"><div class="val" id="stat-orders">—</div><div class="lbl">Total Orders</div></div>
-      <div class="card"><div class="val" id="stat-pending">—</div><div class="lbl">Pending</div></div>
-      <div class="card"><div class="val" id="stat-revenue">—</div><div class="lbl">Revenue</div></div>
-    </div>
-  </div>
-
-  <!-- DAILY REPORT -->
-  <div class="section">
-    <h2>📊 Daily Sales</h2>
-    <div id="daily-report" class="card empty">No orders today</div>
-  </div>
-
-  <!-- LOW STOCK -->
-  <div class="section">
-    <h2>⚠️ Low Stock Alerts</h2>
-    <div id="low-stock" class="card empty">Products not added yet</div>
-  </div>
-
-  <!-- PRODUCTS -->
-  <div class="section">
-    <h2>🏪 Product Management</h2>
-    <div id="product-mgmt" class="empty">Products not added yet</div>
-  </div>
-
-  <!-- ORDERS -->
   <div class="section">
     <h2>📋 Orders</h2>
-    <div id="orders-wrap"></div>
+    <div id="ordersWrap" class="card empty">Loading orders…</div>
   </div>
 
 </div>
@@ -153,8 +105,8 @@ if(sessionStorage.getItem("admin_auth")==="yes"){
 }
 
 function loginAdmin(){
-  const pass = document.getElementById("admin-pass");
-  const err  = document.getElementById("login-error");
+  const pass = document.getElementById("adminPass");
+  const err  = document.getElementById("loginError");
 
   if(pass.value === ADMIN_PASSWORD){
     sessionStorage.setItem("admin_auth","yes");
@@ -164,47 +116,17 @@ function loginAdmin(){
   }
 }
 
-/* ================= DATA ================= */
-let orders = [];
-let products = [];
-
-/* LOAD ORDERS */
+/* ================= LOAD ORDERS ================= */
 fetch(DB + "/orders.json")
 .then(r => r.json())
 .then(data => {
-  if(!data) return;
-  orders = Object.entries(data).map(([id,o]) => ({id, ...o}));
-  renderStats();
-  renderOrders();
-  renderDaily();
-});
-
-/* LOAD PRODUCTS (future-ready) */
-fetch(DB + "/products.json")
-.then(r => r.json())
-.then(data => {
-  if(!data) return;
-  products = Object.entries(data).map(([id,p]) => ({id, ...p}));
-  renderLowStock();
-  renderProducts();
-});
-
-/* ================= STATS ================= */
-function renderStats(){
-  document.getElementById("stat-orders").textContent = orders.length;
-  document.getElementById("stat-pending").textContent =
-    orders.filter(o => o.status === "pending").length;
-  document.getElementById("stat-revenue").textContent =
-    "₹" + orders.reduce((s,o)=>s+(o.total||0),0).toFixed(0);
-}
-
-/* ================= ORDERS ================= */
-function renderOrders(){
-  const wrap = document.getElementById("orders-wrap");
-  if(!orders.length){
-    wrap.innerHTML = '<div class="empty">No orders yet</div>';
+  if(!data){
+    document.getElementById("ordersWrap").innerHTML =
+      '<div class="empty">No orders yet</div>';
     return;
   }
+
+  const orders = Object.entries(data).map(([id,o])=>({id,...o}));
 
   let html = `
   <table>
@@ -214,7 +136,6 @@ function renderOrders(){
         <th>Customer</th>
         <th>Status</th>
         <th>Total</th>
-        <th>Items</th>
       </tr>
     </thead><tbody>`;
 
@@ -222,58 +143,14 @@ function renderOrders(){
     html += `
     <tr>
       <td>${o.order_number || o.id}</td>
-      <td>
-        <strong>${o.customer?.name || "-"}</strong><br>
-        📞 ${o.customer?.phone || ""}
-      </td>
-      <td>
-        <span class="badge ${o.status||"pending"}">${o.status||"pending"}</span><br><br>
-        <select onchange="updateStatus('${o.id}', this.value)">
-          ${["pending","confirmed","delivered","cancelled"]
-            .map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${s}</option>`).join("")}
-        </select>
-      </td>
-      <td><strong>₹${(o.total||0).toFixed(2)}</strong></td>
-      <td class="items">
-        ${(o.cart||[]).map(i =>
-          `• ${i.name_marathi||i.name} — ${i.quantity} ${i.unit}`
-        ).join("<br>")}
-      </td>
+      <td>${o.customer?.name || ""}<br>${o.customer?.phone || ""}</td>
+      <td><span class="badge ${o.status||'pending'}">${o.status||'pending'}</span></td>
+      <td>₹${(o.total||0).toFixed(2)}</td>
     </tr>`;
   });
 
-  wrap.innerHTML = html + "</tbody></table>";
-}
-
-function updateStatus(id, status){
-  fetch(`${DB}/orders/${id}/status.json`,{
-    method:"PUT",
-    body:JSON.stringify(status)
-  });
-}
-
-/* ================= DAILY ================= */
-function renderDaily(){
-  const today = new Date().toDateString();
-  const todayOrders = orders.filter(o =>
-    new Date(o.created_at || 0).toDateString() === today
-  );
-  document.getElementById("daily-report").innerHTML =
-    todayOrders.length
-      ? `<strong>${todayOrders.length}</strong> orders today — ₹${todayOrders.reduce((s,o)=>s+(o.total||0),0).toFixed(0)}`
-      : "No orders today";
-}
-
-/* ================= PRODUCTS ================= */
-function renderProducts(){
-  document.getElementById("product-mgmt").innerHTML =
-    products.length ? "Product management ready" : "Products not added yet";
-}
-function renderLowStock(){
-  const low = products.filter(p => p.stock < 5);
-  document.getElementById("low-stock").innerHTML =
-    low.length ? low.map(p=>`${p.name} (${p.stock})`).join("<br>") : "All stocks healthy";
-}
+  document.getElementById("ordersWrap").innerHTML = html + "</tbody></table>";
+});
 </script>
 
 </body>
