@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Gajanan Trading Co.</title>
+    <style>
+        :root {
+            --primary: #1b5e20;
+            --accent: #f57c00;
+            --bg: #f4f6f4;
+            --white: #fff;
+            --border: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+            --radius: 10px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #212121; }
+
+        /* Header */
+        header {
+            background: var(--primary);
+            color: #fff;
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        header h1 { font-size: 18px; font-weight: 700; }
+        header a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; border: 1px solid rgba(255,255,255,0.4); padding: 6px 14px; border-radius: 20px; }
+        header a:hover { background: rgba(255,255,255,0.15); }
+
+        .admin-layout { max-width: 1200px; margin: 24px auto; padding: 0 20px; }
+
+        /* Stat cards */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-val { font-size: 32px; font-weight: 800; color: var(--primary); }
+        .stat-lbl { font-size: 13px; color: #757575; margin-top: 4px; }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-bar select, .filter-bar input {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+        .filter-bar select:focus, .filter-bar input:focus { border-color: var(--primary); }
+
+        /* Section heading */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        /* Orders table */
+        .orders-table-wrap { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: var(--primary); color: #fff; }
+        th, td { padding: 12px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+        th { font-weight: 600; }
+        tbody tr:hover { background: #f9fbe7; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        /* Status badge */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-pending  { background: #fff3e0; color: #e65100; }
+        .badge-confirmed{ background: #e8f5e9; color: #2e7d32; }
+        .badge-delivered{ background: #e3f2fd; color: #1565c0; }
+        .badge-cancelled{ background: #fce4ec; color: #c62828; }
+
+        /* Status select */
+        .status-select {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Order detail expand */
+        .order-items-detail {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        /* Expand btn */
+        .btn-expand {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            width: auto;
+            color: var(--primary);
+        }
+        .btn-expand:hover { background: #e8f5e9; }
+
+        .empty-msg { text-align: center; padding: 60px; color: #9e9e9e; font-size: 16px; }
+        .loading   { text-align: center; padding: 60px; color: #9e9e9e; }
+
+        /* Feature 6: Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 46px; height: 24px; cursor: pointer; }
+        .toggle-slider {
+            position: absolute; top:0; left:0; right:0; bottom:0;
+            background: #ccc; border-radius: 24px; transition: .3s;
+        }
+        .toggle-slider:before {
+            content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background: #fff; border-radius: 50%; transition: .3s;
+        }
+        input:checked + .toggle-slider { background: #1b5e20; }
+        input:checked + .toggle-slider:before { transform: translateX(22px); }
+
+        @media (max-width: 700px) {
+            th:nth-child(5), td:nth-child(5),
+            th:nth-child(6), td:nth-child(6) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ ADMIN PASSWORD GATE ═══════════════════════ -->
+<div id="admin-gate" style="
+    position:fixed; inset:0; z-index:99999;
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 60%, #388e3c 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Segoe UI',Arial,sans-serif;">
+    <div style="
+        background:#fff; border-radius:16px; padding:40px 36px;
+        width:100%; max-width:380px; text-align:center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
+        <div style="font-size:48px;margin-bottom:8px">🔐</div>
+        <h2 style="color:#1b5e20;font-size:22px;margin-bottom:4px">Admin Access</h2>
+        <p style="color:#757575;font-size:13px;margin-bottom:24px">गजानन ट्रेडिंग कंपनी • Mantha</p>
+        <input type="password" id="gate-password"
+               placeholder="Enter Admin Password"
+               maxlength="30"
+               style="width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:10px;
+                      font-size:16px;outline:none;text-align:center;letter-spacing:3px;margin-bottom:8px"
+               onkeydown="if(event.key==='Enter') checkAdminPassword()"
+               oninput="document.getElementById('gate-error').style.display='none'">
+        <div id="gate-error"
+             style="color:#d32f2f;font-size:13px;display:none;margin-bottom:8px;font-weight:600">
+            ❌ चुकीचा पासवर्ड! Wrong password. Try again.
+        </div>
+        <button onclick="checkAdminPassword()"
+                style="width:100%;padding:13px;background:#1b5e20;color:#fff;border:none;
+                       border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;
+                       transition:background .2s;margin-bottom:14px">
+            🔓 Enter Admin Panel
+        </button>
+        <a href="index.html"
+           style="font-size:13px;color:#9e9e9e;text-decoration:none">← Back to Shop</a>
+    </div>
+</div>
+
+<script>
+    // ════════════════════════════════════
+    // 🔑 SET YOUR ADMIN PASSWORD HERE ↓
+    const ADMIN_PASSWORD = 'gajanan123';
+    // ════════════════════════════════════
+
+    (function() {
+        // Check if already authenticated this session
+        if (sessionStorage.getItem('gtc_admin_auth') === 'yes') {
+            document.getElementById('admin-gate').style.display = 'none';
+        } else {
+            // Focus the password field automatically
+            window.addEventListener('DOMContentLoaded', () => {
+                const input = document.getElementById('gate-password');
+                if (input) setTimeout(() => input.focus(), 100);
+            });
+        }
+    })();
+
+    function checkAdminPassword() {
+        const input = document.getElementById('gate-password');
+        const errEl = document.getElementById('gate-error');
+        if (input.value === ADMIN_PASSWORD) {
+            sessionStorage.setItem('gtc_admin_auth', 'yes');
+            document.getElementById('admin-gate').style.display = 'none';
+        } else {
+            errEl.style.display = 'block';
+            input.value = '';
+            input.focus();
+            // Shake animation
+            input.style.borderColor = '#d32f2f';
+            input.style.animation   = 'shake .4s';
+            setTimeout(() => {
+                input.style.borderColor = '#e0e0e0';
+                input.style.animation   = '';
+            }, 500);
+        }
+    }
+</script>
+<style>
+    @keyframes shake {
+        0%,100%{transform:translateX(0)}
+        20%{transform:translateX(-8px)}
+        40%{transform:translateX(8px)}
+        60%{transform:translateX(-5px)}
+        80%{transform:translateX(5px)}
+    }
+</style>
+<!-- ═══════════════════════ END GATE ═══════════════════════ -->
+
+
+<header>
+    <h1>👨‍💼 Admin — Gajanan Trading Co.</h1>
+    <a href="index.html">← Shop</a>
+</header>
+
+<div class="admin-layout">
+
+    <!-- Stats -->
+    <div class="stats-row" id="stats-row">
+        <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lbl">Total Orders</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-pending">—</div><div class="stat-lbl">Pending</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-confirmed">—</div><div class="stat-lbl">Confirmed</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-revenue">—</div><div class="stat-lbl">Total Revenue</div></div>
+    </div>
+
+    <!-- ══ FEATURE 3: DAILY SALES REPORT ══ -->
+    <div class="section-title" style="margin-top:0">📊 आजचा विक्री अहवाल (Daily Sales Report)
+        <button onclick="renderDailyReport()" style="margin-left:12px;background:#e8f5e9;border:1px solid #c8e6c9;color:#1b5e20;padding:4px 12px;border-radius:8px;font-size:13px;cursor:pointer">🔄 Refresh</button>
+    </div>
+    <div id="daily-report-wrap" style="margin-bottom:28px">
+        <!-- filled by JS -->
+    </div>
+
+    <!-- ══ FEATURE 4: LOW STOCK ALERTS ══ -->
+    <div class="section-title">⚠️ कमी साठा सूचना (Low Stock Alerts)
+        <span id="low-stock-count" style="background:#fff3e0;color:#e65100;padding:2px 10px;border-radius:10px;font-size:13px;margin-left:10px">—</span>
+    </div>
+    <div id="low-stock-wrap" style="margin-bottom:28px">
+        <!-- filled by JS -->
+    </div>
+
+    <!-- ══ FEATURE 6 + 7: PRODUCT MANAGEMENT (Out-of-Stock Toggle + Edit Prices) ══ -->
+    <div class="section-title" style="display:flex;align-items:center;flex-wrap:wrap;gap:12px">
+        🏪 उत्पादन व्यवस्थापन (Product Management)
+        <input type="text" id="pm-search" placeholder="Search product..." oninput="renderProductManagement()"
+               style="border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;outline:none;font-weight:400">
+    </div>
+    <div id="product-mgmt-wrap" style="margin-bottom:28px">
+        <!-- filled by JS -->
+    </div>
+
+    <!-- ══ Orders Section ══ -->
+    <div class="section-title">📋 All Orders</div>
+
+
+    <div class="filter-bar">
+        <select id="filter-status" onchange="applyFilter()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+        <input type="text" id="filter-search" placeholder="Search by name / order #" oninput="applyFilter()">
+    </div>
+
+    <div id="orders-wrap" class="orders-table-wrap">
+        <div class="loading">Loading orders...</div>
+    </div>
+
+</div>
+
+<script>
+const API = '';
+let allOrders   = [];
+let allProducts = []; // for Features 4, 6, 7
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadOrders();
+    loadProductsAdmin();
+});
+
+/* ════ ORDERS ════ */
+async function loadOrders() {
+    try {
+        const res  = await fetch(API + '/api/orders');
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+        allOrders = data.orders;
+        renderStats();
+        renderDailyReport();
+        applyFilter();
+    } catch (e) {
+        document.getElementById('orders-wrap').innerHTML =
+            `<div class="empty-msg">❌ Error loading orders: ${e.message}</div>`;
+    }
+}
+
+function renderStats() {
+    const pending   = allOrders.filter(o => o.status === 'pending').length;
+    const confirmed = allOrders.filter(o => o.status === 'confirmed').length;
+    const revenue   = allOrders.reduce((s, o) => s + (o.total || 0), 0);
+    document.getElementById('stat-total').textContent     = allOrders.length;
+    document.getElementById('stat-pending').textContent   = pending;
+    document.getElementById('stat-confirmed').textContent = confirmed;
+    document.getElementById('stat-revenue').textContent   = '₹' + revenue.toFixed(0);
+}
+
+/* ════ FEATURE 3: DAILY SALES REPORT ════ */
+function renderDailyReport() {
+    const wrap = document.getElementById('daily-report-wrap');
+    if (!wrap) return;
+    const todayStr  = new Date().toDateString();
+    const todayOrds = allOrders.filter(o => new Date(o.date).toDateString() === todayStr);
+    if (todayOrds.length === 0) {
+        wrap.innerHTML = `<div style="background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:24px;text-align:center;color:#9e9e9e">
+            <div style="font-size:36px;margin-bottom:10px">📭</div><p>आजचे कोणतेही ऑर्डर नाहीत (No orders today)</p></div>`;
+        return;
+    }
+    const revenue   = todayOrds.reduce((s, o) => s + (o.total||0), 0);
+    const pending   = todayOrds.filter(o => o.status==='pending').length;
+    const confirmed = todayOrds.filter(o => o.status==='confirmed').length;
+    const productSales = {};
+    todayOrds.forEach(o => (o.cart||[]).forEach(item => {
+        const k = item.name_marathi || item.name;
+        if (!productSales[k]) productSales[k] = { name:k, qty:0, revenue:0, unit:item.unit };
+        productSales[k].qty     += item.quantity;
+        productSales[k].revenue += item.item_total;
+    }));
+    const topProducts = Object.values(productSales).sort((a,b)=>b.revenue-a.revenue).slice(0,5);
+    wrap.innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+            <div class="stat-card"><div class="stat-val">${todayOrds.length}</div><div class="stat-lbl">Today's Orders</div></div>
+            <div class="stat-card"><div class="stat-val" style="color:#e65100">${pending}</div><div class="stat-lbl">Pending</div></div>
+            <div class="stat-card"><div class="stat-val">${confirmed}</div><div class="stat-lbl">Confirmed</div></div>
+            <div class="stat-card"><div class="stat-val">₹${revenue.toFixed(0)}</div><div class="stat-lbl">Today's Revenue</div></div>
+        </div>
+        ${topProducts.length ? `<div style="background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:18px">
+            <div style="font-weight:700;color:#1b5e20;margin-bottom:12px;font-size:14px">🏆 आजचे सर्वाधिक विकले जाणारे (Top Selling Today)</div>
+            ${topProducts.map((p,i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                <div><span style="background:#e8f5e9;color:#1b5e20;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;font-size:11px;font-weight:700;margin-right:8px">${i+1}</span><strong>${p.name}</strong></div>
+                <div style="text-align:right;font-size:13px"><span style="color:#555">${p.qty} ${p.unit}</span><span style="font-weight:700;color:#1b5e20;margin-left:10px">₹${p.revenue.toFixed(0)}</span></div>
+            </div>`).join('')}
+        </div>` : ''}
+        <div style="margin-top:12px;text-align:right">
+            <button onclick="printDailyReport()" style="background:#1b5e20;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer">🖨️ Print Daily Report</button>
+        </div>`;
+}
+
+/* ════ FEATURE 5: PRINT DAILY REPORT (Owner) ════ */
+function printDailyReport() {
+    const todayStr  = new Date().toDateString();
+    const todayOrds = allOrders.filter(o => new Date(o.date).toDateString() === todayStr);
+    const revenue   = todayOrds.reduce((s,o) => s+(o.total||0), 0);
+    const productSales = {};
+    todayOrds.forEach(o => (o.cart||[]).forEach(item => {
+        const k = item.name_marathi||item.name;
+        if (!productSales[k]) productSales[k] = { name:k, qty:0, revenue:0, unit:item.unit };
+        productSales[k].qty += item.quantity; productSales[k].revenue += item.item_total;
+    }));
+    const topProducts = Object.values(productSales).sort((a,b)=>b.revenue-a.revenue);
+    const win = window.open('','_blank','width=750,height=1000');
+    win.document.write(`<!DOCTYPE html><html><head><title>Daily Report</title><meta charset="UTF-8"><style>
+        body{font-family:'Segoe UI',Arial,sans-serif;padding:28px;color:#212121;max-width:720px;margin:0 auto}
+        h1{color:#1b5e20} .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 24px}
+        .kpi-box{background:#f4f6f4;border-radius:8px;padding:14px;text-align:center}
+        .kpi-val{font-size:26px;font-weight:800;color:#1b5e20} .kpi-lbl{font-size:12px;color:#757575;margin-top:4px}
+        table{width:100%;border-collapse:collapse;margin-bottom:20px}
+        th{background:#1b5e20;color:#fff;padding:10px 12px;text-align:left;font-size:13px}
+        td{padding:9px 12px;font-size:13px;border-bottom:1px solid #f0f0f0}
+        tr:nth-child(even){background:#f9fbe7} @media print{.no-print{display:none}}
+    </style></head><body>
+    <h1>📊 Gajanan Trading Co. — Daily Report</h1>
+    <p style="color:#757575;font-size:13px">${new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p>
+    <div class="kpi">
+        <div class="kpi-box"><div class="kpi-val">${todayOrds.length}</div><div class="kpi-lbl">Total Orders</div></div>
+        <div class="kpi-box"><div class="kpi-val">${todayOrds.filter(o=>o.status==='pending').length}</div><div class="kpi-lbl">Pending</div></div>
+        <div class="kpi-box"><div class="kpi-val">${todayOrds.filter(o=>o.status==='confirmed').length}</div><div class="kpi-lbl">Confirmed</div></div>
+        <div class="kpi-box"><div class="kpi-val">₹${revenue.toFixed(0)}</div><div class="kpi-lbl">Revenue</div></div>
+    </div>
+    <h3 style="color:#1b5e20;margin-bottom:10px">📋 Order Details</h3>
+    <table><thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Pickup</th></tr></thead>
+    <tbody>${todayOrds.map(o=>`<tr><td>${o.order_number}</td><td><strong>${o.customer?.name||'—'}</strong><br><small>${o.customer?.phone||''}</small></td><td>${(o.cart||[]).length}</td><td><strong>₹${(o.total||0).toFixed(2)}</strong></td><td>${o.status}</td><td>${o.customer?.pickup_slot||'—'}</td></tr>`).join('')}</tbody></table>
+    <h3 style="color:#1b5e20;margin-bottom:10px">🏆 Product Sales Summary</h3>
+    <table><thead><tr><th>#</th><th>Product</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+    <tbody>${topProducts.map((p,i)=>`<tr><td>${i+1}</td><td>${p.name}</td><td>${p.qty} ${p.unit}</td><td>₹${p.revenue.toFixed(2)}</td></tr>`).join('')}</tbody></table>
+    <div class="no-print" style="text-align:center;margin-top:20px">
+        <button onclick="window.print()" style="background:#1b5e20;color:#fff;border:none;padding:12px 30px;border-radius:8px;font-size:16px;cursor:pointer">🖨️ Print</button>
+        <button onclick="window.close()" style="background:#f0f0f0;color:#333;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer;margin-left:10px">✕ Close</button>
+    </div></body></html>`);
+    win.document.close(); setTimeout(()=>win.print(),400);
+}
+
+/* ════ PRODUCTS (for Features 4, 6, 7) ════ */
+async function loadProductsAdmin() {
+    try {
+        const res  = await fetch(API + '/api/products');
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+        allProducts = data.products;
+        renderLowStockAlerts();
+        renderProductManagement();
+    } catch (e) { console.error('Could not load products:', e.message); }
+}
+
+/* ════ FEATURE 4: LOW STOCK ALERTS ════ */
+const LOW_STOCK_THRESHOLD = 5;
+
+function renderLowStockAlerts() {
+    const wrap    = document.getElementById('low-stock-wrap');
+    const countEl = document.getElementById('low-stock-count');
+    if (!wrap) return;
+    const lowStock = allProducts.filter(p => p.stock >= 0 && p.stock < LOW_STOCK_THRESHOLD);
+    if (countEl) countEl.textContent = lowStock.length > 0 ? `⚠️ ${lowStock.length} products` : '✅ All Good';
+    if (lowStock.length === 0) {
+        wrap.innerHTML = `<div style="background:#e8f5e9;border-radius:10px;padding:20px;text-align:center;color:#2e7d32;font-weight:600">
+            ✅ सर्व उत्पादने पुरेशा साठ्यात आहेत (All products have sufficient stock)</div>`;
+        return;
+    }
+    wrap.innerHTML = `<div style="background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+            <thead style="background:#fff3e0"><tr>
+                <th style="padding:11px 14px;text-align:left;font-size:13px;color:#e65100">Product</th>
+                <th style="padding:11px 14px;text-align:center;font-size:13px;color:#e65100">Stock</th>
+                <th style="padding:11px 14px;text-align:center;font-size:13px;color:#e65100">Unit</th>
+            </tr></thead>
+            <tbody>${lowStock.map(p=>`<tr style="border-bottom:1px solid #f0f0f0">
+                <td style="padding:10px 14px"><strong>${p.name_marathi||p.name}</strong><br><span style="font-size:12px;color:#9e9e9e">${p.name_marathi?p.name:''}</span></td>
+                <td style="padding:10px 14px;text-align:center"><span style="background:${p.stock===0?'#fce4ec':'#fff3e0'};color:${p.stock===0?'#c62828':'#e65100'};padding:4px 12px;border-radius:12px;font-weight:700;font-size:13px">${p.stock===0?'❌ Out of Stock':`⚠️ ${p.stock} left`}</span></td>
+                <td style="padding:10px 14px;text-align:center;font-size:13px;color:#9e9e9e">${p.unit}</td>
+            </tr>`).join('')}</tbody>
+        </table></div>`;
+}
+
+/* ════ FEATURES 6 & 7: PRODUCT MANAGEMENT ════ */
+function renderProductManagement() {
+    const wrap  = document.getElementById('product-mgmt-wrap');
+    const query = (document.getElementById('pm-search')?.value||'').toLowerCase().trim();
+    if (!wrap) return;
+    let products = allProducts;
+    if (query) products = products.filter(p =>
+        (p.name||'').toLowerCase().includes(query) || (p.name_marathi||'').toLowerCase().includes(query));
+    if (products.length === 0) {
+        wrap.innerHTML = `<div style="background:#fff;border-radius:10px;padding:24px;text-align:center;color:#9e9e9e;box-shadow:0 2px 10px rgba(0,0,0,.08)">No products found for "${query}"</div>`;
+        return;
+    }
+    wrap.innerHTML = `<div style="background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+            <thead style="background:#1b5e20;color:#fff"><tr>
+                <th style="padding:11px 14px;text-align:left;font-size:13px">Product</th>
+                <th style="padding:11px 14px;text-align:center;font-size:13px">Stock</th>
+                <th style="padding:11px 14px;text-align:center;font-size:13px">Price</th>
+                <th style="padding:11px 14px;text-align:center;font-size:13px">✅ In Stock Toggle</th>
+                <th style="padding:11px 14px;text-align:center;font-size:13px">✏️ Edit Price</th>
+            </tr></thead>
+            <tbody>${products.map(p=>`
+            <tr style="border-bottom:1px solid #f0f0f0" id="pm-row-${p.excelRowIndex}">
+                <td style="padding:10px 14px"><strong>${p.name_marathi||p.name}</strong><br><span style="font-size:11px;color:#9e9e9e">${p.name_marathi?p.name:''}</span></td>
+                <td style="padding:10px 14px;text-align:center"><span style="font-weight:600;color:${p.stock===0?'#c62828':'#2e7d32'}">${p.stock}</span> <span style="font-size:11px;color:#9e9e9e">${p.unit}</span></td>
+                <td style="padding:10px 14px;text-align:center;font-weight:600;color:#1b5e20">₹${p.price_per_unit.toFixed(2)}/${p.unit}</td>
+                <td style="padding:10px 14px;text-align:center">
+                    <label class="toggle-switch" title="Toggle stock availability">
+                        <input type="checkbox" ${p.in_stock?'checked':''} onchange="toggleProductStock(${p.excelRowIndex},this.checked,this)" style="position:absolute;opacity:0;width:0;height:0">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </td>
+                <td style="padding:10px 14px;text-align:center">
+                    <div style="display:flex;align-items:center;gap:6px;justify-content:center">
+                        <span style="font-size:13px;color:#555">₹</span>
+                        <input type="number" step="0.5" min="0.5" id="price-input-${p.excelRowIndex}" value="${p.price_per_unit}"
+                               style="width:72px;border:1px solid #e0e0e0;border-radius:6px;padding:5px 7px;font-size:13px;outline:none;text-align:right">
+                        <button onclick="saveProductPrice(${p.excelRowIndex})"
+                                style="background:#1b5e20;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap">💾 Save</button>
+                    </div>
+                </td>
+            </tr>`).join('')}
+            </tbody>
+        </table></div>`;
+}
+
+async function toggleProductStock(excelRowIndex, inStock, checkbox) {
+    try {
+        const res = await fetch(`${API}/api/products/${excelRowIndex}/toggle-stock`, {
+            method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({in_stock:inStock})
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+        const product = allProducts.find(p=>p.excelRowIndex===excelRowIndex);
+        if (product) { product.in_stock=inStock; product.stock=inStock?999:0; }
+        showAdminToast(inStock?'✅ Marked In Stock':'❌ Marked Out of Stock', inStock?'success':'warn');
+        renderLowStockAlerts();
+    } catch (e) { alert('Error: '+e.message); checkbox.checked=!inStock; }
+}
+
+async function saveProductPrice(excelRowIndex) {
+    const input = document.getElementById(`price-input-${excelRowIndex}`);
+    if (!input) return;
+    const price = parseFloat(input.value);
+    if (!price||price<=0) { alert('Please enter a valid price.'); return; }
+    try {
+        const res = await fetch(`${API}/api/products/${excelRowIndex}/price`, {
+            method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({price})
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+        const product = allProducts.find(p=>p.excelRowIndex===excelRowIndex);
+        if (product) product.price_per_unit=price;
+        showAdminToast(`💰 Price updated to ₹${price}`, 'success');
+    } catch (e) { alert('Error: '+e.message); }
+}
+
+function showAdminToast(msg, type) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText=`position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;background:${type==='success'?'#1b5e20':type==='warn'?'#e65100':'#c62828'};color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.2);transition:opacity .3s`;
+    document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),350);},2500);
+}
+
+/* ════ ORDERS TABLE ════ */
+function applyFilter() {
+    const status = document.getElementById('filter-status').value;
+    const search = document.getElementById('filter-search').value.toLowerCase().trim();
+
+    let filtered = allOrders;
+    if (status) filtered = filtered.filter(o => o.status === status);
+    if (search) filtered = filtered.filter(o =>
+        (o.customer?.name || '').toLowerCase().includes(search) ||
+        (o.order_number || '').toLowerCase().includes(search) ||
+        (o.customer?.phone || '').includes(search)
+    );
+
+    renderOrdersTable(filtered);
+}
+
+function renderOrdersTable(orders) {
+    const wrap = document.getElementById('orders-wrap');
+
+    if (orders.length === 0) {
+        wrap.innerHTML = `<div class="empty-msg">कोणतेही ऑर्डर सापडले नाहीत (No orders found)</div>`;
+        return;
+    }
+
+    const rows = orders.map(o => {
+        const date = new Date(o.date).toLocaleString('en-IN', {
+            day:'2-digit', month:'short', year:'numeric',
+            hour:'2-digit', minute:'2-digit'
+        });
+        const badgeClass = { pending:'badge-pending', confirmed:'badge-confirmed', delivered:'badge-delivered', cancelled:'badge-cancelled' }[o.status] || 'badge-pending';
+        const itemCount  = (o.cart || []).length;
+
+        return `
+            <tr>
+                <td><strong>${o.order_number}</strong></td>
+                <td>
+                    <strong>${o.customer?.name || '—'}</strong><br>
+                    <span style="font-size:12px;color:#757575">${o.customer?.phone || ''}</span><br>
+                    ${o.customer?.address ? `<span style="font-size:11px;color:#9e9e9e">${o.customer.address}</span>` : ''}
+                </td>
+                <td>
+                    <span class="badge ${badgeClass}">${o.status || 'pending'}</span>
+                </td>
+                <td>
+                    <strong>₹${(o.total || 0).toFixed(2)}</strong><br>
+                    <span style="font-size:12px;color:#9e9e9e">${itemCount} item${itemCount !== 1 ? 's' : ''}</span>
+                </td>
+                <td>
+                    ${o.customer?.pickup_slot
+                        ? `<span style="display:inline-block;background:#e8f5e9;color:#2e7d32;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600">🕐 ${o.customer.pickup_slot}</span>`
+                        : `<span style="color:#9e9e9e;font-size:12px">—</span>`
+                    }
+                </td>
+                <td style="font-size:12px;color:#757575">${date}</td>
+                <td>
+                    <select class="status-select" onchange="updateStatus('${o.id}', this.value)">
+                        <option value="pending"   ${o.status==='pending'   ?'selected':''}>Pending</option>
+                        <option value="confirmed" ${o.status==='confirmed' ?'selected':''}>Confirmed</option>
+                        <option value="delivered" ${o.status==='delivered' ?'selected':''}>Delivered</option>
+                        <option value="cancelled" ${o.status==='cancelled' ?'selected':''}>Cancelled</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn-expand" onclick="toggleItems('${o.id}')">Items ▾</button>
+                    <button class="btn-expand" onclick="adminPrintBill(${o.id})" style="margin-top:4px;background:#f0fdf4;border-color:#c8e6c9;color:#1b5e20">🖨️ Bill</button>
+                    <div id="items-${o.id}" class="order-items-detail" style="display:none;margin-top:8px">
+                        ${(o.cart || []).map(item =>
+                            `• ${item.name_marathi || item.name} — ${item.quantity} ${item.unit} = ₹${item.item_total.toFixed(2)}`
+                        ).join('<br>')}
+                        ${o.customer?.notes ? `<br><em>Note: ${o.customer.notes}</em>` : ''}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    wrap.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>🕐 Pickup Slot</th>
+                    <th>Date</th>
+                    <th>Update Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
+async function updateStatus(orderId, newStatus) {
+    try {
+        const res = await fetch(`${API}/api/orders/${orderId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+
+        // Update local state
+        const order = allOrders.find(o => o.id === orderId);
+        if (order) order.status = newStatus;
+
+        renderStats();
+        renderDailyReport();
+        showAdminToast(`Status → "${newStatus}"`, 'success');
+    } catch (e) {
+        alert('Error updating status: ' + e.message);
+    }
+}
+
+function toggleItems(orderId) {
+    const el = document.getElementById('items-' + orderId);
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+/* ════ FEATURE 5: PRINT BILL (Admin/Owner per order) ════ */
+function adminPrintBill(orderId) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (!order) { alert('Order not found'); return; }
+    const date = new Date(order.date).toLocaleString('en-IN',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const itemRows = (order.cart||[]).map(item=>`<tr>
+        <td style="padding:8px;border-bottom:1px solid #f0f0f0">${item.name_marathi||item.name}<br><span style="font-size:11px;color:#888">${item.name_marathi?item.name:''}</span></td>
+        <td style="padding:8px;border-bottom:1px solid #f0f0f0;text-align:center">${item.quantity} ${item.unit}</td>
+        <td style="padding:8px;border-bottom:1px solid #f0f0f0;text-align:right">₹${item.price_per_unit.toFixed(2)}</td>
+        <td style="padding:8px;border-bottom:1px solid #f0f0f0;text-align:right;font-weight:700">₹${item.item_total.toFixed(2)}</td>
+    </tr>`).join('');
+    const win = window.open('','_blank','width=700,height=900');
+    win.document.write(`<!DOCTYPE html><html><head><title>Invoice — ${order.order_number}</title><meta charset="UTF-8"><style>
+        body{font-family:'Segoe UI',Arial,sans-serif;padding:28px;color:#212121;max-width:680px;margin:0 auto}
+        .hdr{background:#1b5e20;color:#fff;padding:20px 24px;border-radius:10px;display:flex;justify-content:space-between;margin-bottom:16px}
+        .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#f9f9f9;padding:14px 18px;border-radius:8px;margin-bottom:16px}
+        .lbl{font-size:11px;color:#888;margin-bottom:3px;text-transform:uppercase} .val{font-size:14px;font-weight:600}
+        table{width:100%;border-collapse:collapse} thead{background:#f4f6f4}
+        th{padding:10px 8px;text-align:left;font-size:12px;color:#555;border-bottom:2px solid #ddd}
+        th:nth-child(2){text-align:center} th:nth-child(3),th:nth-child(4){text-align:right}
+        .tot-row{background:#e8f5e9;font-weight:700;font-size:15px} .tot-row td{padding:12px 8px}
+        .footer{text-align:center;margin-top:20px;padding-top:14px;border-top:1px dashed #ccc;font-size:12px;color:#888}
+        @media print{.no-print{display:none}}
+    </style></head><body>
+    <div class="hdr">
+        <div><div style="font-size:20px;font-weight:800">🛒 Gajanan Trading Co.</div><div style="font-size:12px;opacity:.8;margin-top:4px">गजानन ट्रेडिंग कंपनी • मंठा</div></div>
+        <div style="text-align:right"><div style="font-size:11px;opacity:.8">TAX INVOICE</div><div style="font-size:16px;font-weight:700;margin-top:4px">${order.order_number}</div><div style="font-size:11px;opacity:.8;margin-top:4px">${date}</div></div>
+    </div>
+    <div class="info-grid">
+        <div><div class="lbl">Bill To</div><div class="val">${order.customer?.name||'—'}</div>
+            <div style="font-size:13px;color:#555;margin-top:4px">📱 ${order.customer?.phone||''}</div>
+            ${order.customer?.address?`<div style="font-size:12px;color:#777;margin-top:2px">📍 ${order.customer.address}</div>`:''}
+        </div>
+        <div><div class="lbl">Pickup Slot</div><div class="val">${order.customer?.pickup_slot||'Not specified'}</div>
+            <div style="margin-top:10px"><div class="lbl">Status</div><div class="val" style="color:#1b5e20">${(order.status||'pending').toUpperCase()}</div></div>
+        </div>
+    </div>
+    <table><thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>${itemRows}<tr class="tot-row"><td colspan="3" style="text-align:right;padding:12px 8px">एकूण (Total)</td><td style="text-align:right;padding:12px 8px">₹${(order.total||0).toFixed(2)}</td></tr></tbody></table>
+    ${order.customer?.notes?`<div style="background:#fff8e1;border-left:4px solid #f57c00;padding:10px 14px;border-radius:6px;font-size:13px;margin-top:14px"><strong>📝 Notes:</strong> ${order.customer.notes}</div>`:''}
+    <div class="footer"><p>धन्यवाद! आपल्या खरेदीबद्दल आभारी आहोत।</p><p style="margin-top:4px">Thank you for shopping with Gajanan Trading Co.</p></div>
+    <div class="no-print" style="text-align:center;margin-top:20px">
+        <button onclick="window.print()" style="background:#1b5e20;color:#fff;border:none;padding:12px 30px;border-radius:8px;font-size:16px;cursor:pointer">🖨️ Print</button>
+        <button onclick="window.close()" style="background:#f0f0f0;color:#333;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer;margin-left:10px">✕ Close</button>
+    </div></body></html>`);
+    win.document.close(); setTimeout(()=>win.print(),400);
+}
+</script>
+
+</body>
+</html>

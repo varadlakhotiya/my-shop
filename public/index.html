@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gajanan Trading Co. - किराणा दुकान</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER -->
+<header id="main-header">
+    <div class="header-inner">
+        <div class="logo-area" onclick="goHome()">
+            <span class="logo-emoji">🛒</span>
+            <div class="logo-text">
+                <span class="logo-en">Gajanan Trading Co.</span>
+                <span class="logo-mr">गजानन ट्रेडिंग कंपनी • मंठा</span>
+            </div>
+        </div>
+
+        <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="शोधा... Search products...">
+        </div>
+
+        <div class="header-right">
+            <!-- FEATURE 3: Wishlist Button -->
+            <button class="btn-wishlist-trigger" onclick="openWishlist()" title="माझी आवड (Wishlist)">
+                <span>❤️</span>
+                <span class="wish-badge" id="wishlist-count" style="display:none">0</span>
+            </button>
+
+            <button class="btn-cart-trigger" onclick="toggleCart()">
+                <span>🛒</span>
+                <span>कार्ट</span>
+                <span class="cart-badge" id="cart-count">0</span>
+            </button>
+            <a href="admin.html" class="btn-admin">⚙️</a>
+            <!-- FEATURE 1: Order History Button -->
+            <button class="btn-order-history" onclick="openOrderHistory()" title="माझ्या ऑर्डर्स">
+                📦 माझे ऑर्डर
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════════════════════════════════════ LAYOUT -->
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="sidebar-header">वर्गवारी</div>
+        <div id="sidebar-categories"></div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+
+        <!-- HOME VIEW -->
+        <div id="home-view">
+
+            <!-- ── HERO ── -->
+            <section class="home-section hero-section" id="hero-section"></section>
+
+            <!-- ── BUY AGAIN ── -->
+            <section class="home-section" id="buy-again-section" style="display:none"></section>
+
+            <!-- ── POPULAR PRODUCTS ── -->
+            <section class="home-section" id="popular-section"></section>
+
+            <!-- ── SEARCH RESULTS BANNER ── -->
+            <div id="search-results-banner" class="search-banner hidden"></div>
+
+            <!-- ── CATEGORY GRID ── -->
+            <div class="home-section">
+                <div class="section-head">
+                    <div class="section-head-text">
+                        <div class="section-title-mr">🏪 वर्गवारी निवडा</div>
+                        <div class="section-title-en">Shop by Category — Browse All Products</div>
+                    </div>
+                </div>
+                <div id="category-grid" class="cat-grid"></div>
+            </div>
+
+            <!-- ── WHY CHOOSE US ── -->
+            <section class="home-section why-us-bg" id="why-us-section"></section>
+
+            <!-- ── ABOUT STORE ── -->
+            <section class="home-section" id="about-section"></section>
+
+            <!-- ── BRANDS ── -->
+            <section class="home-section brands-bg" id="brands-section"></section>
+
+            <!-- ── TESTIMONIALS ── -->
+            <section class="home-section" id="testimonials-section"></section>
+
+            <!-- ── GALLERY ── -->
+            <section class="home-section" id="gallery-section"></section>
+
+            <!-- ── STORE LOCATION ── -->
+            <section class="home-section" id="location-section"></section>
+
+        </div>
+
+        <!-- PRODUCTS VIEW -->
+        <div id="products-view" style="display:none">
+            <div class="products-view-header">
+                <button class="btn-back" onclick="goHome()">← मागे / Back</button>
+                <h2 id="products-view-title">Products</h2>
+            </div>
+            <div id="product-grid" class="product-grid"></div>
+        </div>
+
+    </main>
+
+    <!-- RIGHT INFO SIDEBAR -->
+    <aside id="info-sidebar">
+        <div class="sidebar-header">माहिती / Info</div>
+        <div class="info-btn-grid">
+            <button class="info-sidebar-btn" onclick="openSectionPopup('popular')">
+                <span class="info-btn-icon">⭐</span>
+                <span class="info-btn-mr">लोकप्रिय उत्पादने</span>
+                <span class="info-btn-en">Popular Products</span>
+            </button>
+            <button class="info-sidebar-btn" onclick="openSectionPopup('why')">
+                <span class="info-btn-icon">🌟</span>
+                <span class="info-btn-mr">का निवडायचे?</span>
+                <span class="info-btn-en">Why Choose Us?</span>
+            </button>
+            <button class="info-sidebar-btn" onclick="openSectionPopup('about')">
+                <span class="info-btn-icon">🏪</span>
+                <span class="info-btn-mr">आमच्याबद्दल</span>
+                <span class="info-btn-en">About Our Store</span>
+            </button>
+            <button class="info-sidebar-btn" onclick="openSectionPopup('brands')">
+                <span class="info-btn-icon">🏅</span>
+                <span class="info-btn-mr">आमचे ब्रँड्स</span>
+                <span class="info-btn-en">Brands We Deal In</span>
+            </button>
+            <button class="info-sidebar-btn" onclick="openSectionPopup('testimonials')">
+                <span class="info-btn-icon">💬</span>
+                <span class="info-btn-mr">ग्राहकांचे अनुभव</span>
+                <span class="info-btn-en">Testimonials</span>
+            </button>
+            <button class="info-sidebar-btn" onclick="openSectionPopup('gallery')">
+                <span class="info-btn-icon">📸</span>
+                <span class="info-btn-mr">आमची गॅलरी</span>
+                <span class="info-btn-en">Our Gallery</span>
+            </button>
+        </div>
+    </aside>
+
+</div>
+
+<!-- ═══════════════════════════════════════ PRODUCT MODAL -->
+<div id="product-modal" class="modal-backdrop">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeProductModal()">✕</button>
+
+        <div class="modal-product-header">
+            <span id="modal-emoji" class="modal-emoji">📦</span>
+            <div>
+                <div id="modal-name" class="modal-name">Product Name</div>
+                <div id="modal-desc" class="modal-desc"></div>
+                <div id="modal-price" class="modal-price"></div>
+            </div>
+        </div>
+
+        <div class="modal-section">
+            <div class="modal-section-label" id="qty-label">प्रमाण निवडा (Select Quantity)</div>
+            <div id="qty-options" class="qty-chips"></div>
+        </div>
+
+        <div class="modal-section" id="custom-qty-section">
+            <div class="modal-section-label">इतर प्रमाण (Custom Quantity)</div>
+            <div class="custom-qty-row">
+                <input type="number" id="custom-qty-input" step="0.1" min="0.1"
+                       placeholder="e.g. 2.5" oninput="onCustomQtyChange()">
+                <span class="custom-unit-label" id="custom-unit-label">kg</span>
+            </div>
+        </div>
+
+        <div class="price-summary-box">
+            <div class="price-summary-sub" id="qty-summary-text">Select a quantity above</div>
+            <div class="price-summary-total" id="price-summary">₹0.00</div>
+        </div>
+
+        <button class="btn-add-to-cart" onclick="addCurrentToCart()">
+            🛒 कार्ट मध्ये टाका (Add to Cart)
+        </button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ CART SIDEBAR -->
+<div id="cart-overlay" class="cart-overlay" onclick="closeCart()"></div>
+<div id="cart-sidebar" class="cart-sidebar">
+    <div class="cart-top">
+        <div>
+            <h3>तुमचे कार्ट</h3>
+            <span id="cart-items-count" class="cart-count-label">0 items</span>
+        </div>
+        <button class="cart-close-btn" onclick="closeCart()">✕</button>
+    </div>
+
+    <div id="cart-items-list" class="cart-items-list"></div>
+
+    <div id="cart-footer" class="cart-footer" style="display:none">
+        <div class="cart-subtotal-row">
+            <span>उप-एकूण (Subtotal)</span>
+            <span id="cart-subtotal">₹0</span>
+        </div>
+        <div class="cart-total-row">
+            <span>एकूण (Total)</span>
+            <span id="cart-total">₹0</span>
+        </div>
+        <button class="btn-checkout" onclick="openCheckout()">ऑर्डर द्या → Checkout</button>
+        <button class="btn-clear-cart" onclick="clearCart()">🗑 कार्ट साफ करा</button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ FEATURE 1: OTP MODAL -->
+<div id="otp-modal" class="modal-backdrop">
+    <div class="modal-box modal-otp">
+        <button class="modal-close" onclick="closeOtpModal()">✕</button>
+        <div class="otp-header">
+            <div class="otp-icon">📱</div>
+            <h3>मोबाइल क्रमांक तपासा</h3>
+            <p>Verify your mobile number to place an order</p>
+        </div>
+
+        <!-- STEP 1: Enter Phone -->
+        <div id="otp-step-1">
+            <div class="otp-field-wrap">
+                <label>मोबाइल नंबर (Mobile Number)</label>
+                <div class="otp-phone-row">
+                    <span class="otp-country-code">🇮🇳 +91</span>
+                    <input type="tel" id="otp-phone" maxlength="10"
+                           placeholder="10-digit mobile number"
+                           onkeydown="if(event.key==='Enter') sendOtp()">
+                </div>
+            </div>
+            <div id="otp-error" class="otp-error" style="display:none"></div>
+            <button class="btn-checkout" id="btn-send-otp" onclick="sendOtp()">
+                OTP पाठवा (Send OTP)
+            </button>
+        </div>
+
+        <!-- STEP 2: Enter OTP -->
+        <div id="otp-step-2" style="display:none">
+            <p class="otp-sent-msg">
+                OTP पाठवला: <strong id="otp-sent-phone"></strong> वर
+            </p>
+            <div class="otp-field-wrap">
+                <label>6-अंकी OTP (Enter 6-digit OTP)</label>
+                <input type="text" id="otp-input" maxlength="6"
+                       inputmode="numeric" pattern="[0-9]*"
+                       placeholder="• • • • • •"
+                       class="otp-digit-input"
+                       onkeydown="if(event.key==='Enter') verifyOtp()">
+            </div>
+            <div id="otp-error" class="otp-error" style="display:none"></div>
+            <button class="btn-checkout" id="btn-verify-otp" onclick="verifyOtp()">
+                OTP तपासा (Verify OTP)
+            </button>
+            <button class="btn-resend" id="btn-resend-otp" onclick="resendOtp()" disabled>
+                Resend in 30s
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ CHECKOUT MODAL (with time slots) -->
+<div id="checkout-modal" class="modal-backdrop">
+    <div class="modal-box modal-checkout">
+        <button class="modal-close" onclick="closeCheckout()">✕</button>
+        <h3 class="checkout-title">📋 ऑर्डर निश्चित करा</h3>
+
+        <div id="checkout-summary" class="checkout-summary"></div>
+
+        <div class="checkout-form">
+            <h4>संपर्क माहिती (Contact Details)</h4>
+            <input type="text"  id="c-name"    placeholder="तुमचे नाव (Full Name) *" required>
+            <input type="tel"   id="c-phone"   placeholder="मोबाईल नंबर (10-digit Phone) *"
+                   maxlength="10" required>
+            <textarea id="c-address" placeholder="पत्ता (Delivery Address)" rows="3"></textarea>
+            <textarea id="c-notes"   placeholder="विशेष सूचना (Special Notes / Instructions)" rows="2"></textarea>
+
+            <!-- FEATURE 2: Pickup Time Slot -->
+            <h4 style="margin-top:16px">🕐 वस्तू घेण्याची वेळ निवडा (Pick-up Time Slot) *</h4>
+            <div id="pickup-slots-container" class="pickup-slots"></div>
+
+            <button class="btn-checkout" onclick="placeOrder()">✅ ऑर्डर द्या (Confirm Order)</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SUCCESS MODAL -->
+<div id="success-modal" class="modal-backdrop">
+    <div class="modal-box modal-success">
+        <div class="success-icon">🎉</div>
+        <h3>ऑर्डर मिळाला!</h3>
+        <p>Order placed successfully!</p>
+        <p id="success-order-no" class="order-no-text"></p>
+        <p id="success-pickup-slot" class="success-slot-text"></p>
+        <p class="success-note">आम्ही लवकरच संपर्क करू • We'll contact you soon</p>
+        <button class="btn-checkout" onclick="closeSuccess()">ठीक आहे (OK)</button>
+        <!-- FEATURE 5: Print Bill Button -->
+        <button class="btn-print-bill" onclick="if(lastPlacedOrder)printCustomerBill(lastPlacedOrder)"
+                style="margin-top:10px;width:100%;background:#f0fdf4;border:2px solid #c8e6c9;color:#1b5e20;border-radius:10px;padding:12px;font-size:15px;cursor:pointer;font-weight:600">
+            🖨️ बिल प्रिंट करा (Print Bill)
+        </button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ FEATURE 3: WISHLIST MODAL -->
+<div id="wishlist-modal" class="modal-backdrop">
+    <div class="modal-box modal-wishlist">
+        <button class="modal-close" onclick="closeWishlist()">✕</button>
+        <div class="wishlist-header">
+            <span style="font-size:24px">❤️</span>
+            <h3>माझी आवड यादी (My Wishlist)</h3>
+        </div>
+        <div id="wishlist-items" class="wishlist-items"></div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SITE FOOTER -->
+<footer id="site-footer" class="site-footer"></footer>
+
+<!-- ═══════════════════════════════════════ TOAST CONTAINER -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ═══════════════════════════════════════ FEATURE 1: ORDER HISTORY MODAL -->
+<div id="order-history-modal" class="modal-backdrop">
+    <div class="modal-box modal-order-history">
+        <button class="modal-close" onclick="closeOrderHistory()">✕</button>
+        <div style="text-align:center;margin-bottom:20px">
+            <div style="font-size:32px;margin-bottom:6px">📦</div>
+            <h3 style="color:#1b5e20;font-size:20px">माझे ऑर्डर्स (My Orders)</h3>
+            <p style="font-size:13px;color:#757575;margin-top:4px">तुमचा मोबाइल नंबर टाका आणि ऑर्डर इतिहास पाहा</p>
+        </div>
+        <!-- Phone Input -->
+        <div id="oh-search-section">
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+                <input type="tel" id="oh-phone" maxlength="10" placeholder="10-digit Mobile Number"
+                       style="flex:1;padding:10px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;outline:none"
+                       onkeydown="if(event.key==='Enter') searchOrderHistory()">
+                <button onclick="searchOrderHistory()"
+                        style="background:#1b5e20;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;cursor:pointer;white-space:nowrap">
+                    🔍 शोधा
+                </button>
+            </div>
+            <div id="oh-error" style="color:#d32f2f;font-size:13px;display:none;margin-bottom:10px"></div>
+        </div>
+        <!-- Results -->
+        <div id="oh-results" style="max-height:400px;overflow-y:auto"></div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SECTION POPUP MODAL -->
+<div id="section-popup-modal" class="modal-backdrop">
+    <div class="modal-box section-popup-box">
+        <button class="modal-close" onclick="closeSectionPopup()">✕</button>
+        <div id="section-popup-content" class="section-popup-content"></div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ MOBILE BOTTOM INFO BAR -->
+<div id="mobile-info-bar">
+    <button class="mob-info-btn" onclick="openSectionPopup('popular')"><span>⭐</span><span>Popular</span></button>
+    <button class="mob-info-btn" onclick="openSectionPopup('why')"><span>🌟</span><span>Why Us</span></button>
+    <button class="mob-info-btn" onclick="openSectionPopup('about')"><span>🏪</span><span>About</span></button>
+    <button class="mob-info-btn" onclick="openSectionPopup('brands')"><span>🏅</span><span>Brands</span></button>
+    <button class="mob-info-btn" onclick="openSectionPopup('testimonials')"><span>💬</span><span>Reviews</span></button>
+    <button class="mob-info-btn" onclick="openSectionPopup('gallery')"><span>📸</span><span>Gallery</span></button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

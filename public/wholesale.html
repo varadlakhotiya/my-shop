@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>घाऊक / Wholesale — Gajanan Trading Co.</title>
+    <style>
+        :root {
+            --primary: #1b5e20; --primary-light: #2e7d32; --accent: #f57c00;
+            --bg: #f4f6f4; --white: #fff; --border: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,.08); --shadow-lg: 0 8px 30px rgba(0,0,0,.15);
+            --radius: 12px; --text: #212121; --muted: #757575;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+        /* HEADER */
+        header {
+            background: var(--primary); color: #fff; height: 62px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; box-shadow: 0 2px 10px rgba(0,0,0,.2); position: sticky; top: 0; z-index: 100;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
+        .logo-mr { font-size: 17px; font-weight: 800; }
+        .logo-en { font-size: 11px; opacity: .75; display: block; margin-top: 1px; }
+        header nav { display: flex; gap: 10px; }
+        header nav a {
+            color: rgba(255,255,255,.8); text-decoration: none; font-size: 13px;
+            border: 1px solid rgba(255,255,255,.35); padding: 7px 16px;
+            border-radius: 20px; transition: background .2s;
+        }
+        header nav a:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+        .page-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 60px; }
+
+        /* HERO */
+        .wholesale-hero {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32, #388e3c);
+            color: #fff; border-radius: var(--radius); padding: 44px 40px;
+            margin-bottom: 28px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+        }
+        .ws-hero-text { flex: 1; min-width: 240px; }
+        .ws-badge {
+            display: inline-block; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+            padding: 5px 14px; border-radius: 20px; font-size: 12px; margin-bottom: 14px;
+        }
+        .ws-title-mr { font-size: 32px; font-weight: 900; line-height: 1.2; margin-bottom: 4px; }
+        .ws-title-en { font-size: 16px; opacity: .8; margin-bottom: 16px; }
+        .ws-tagline-mr { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .ws-tagline-en { font-size: 13px; opacity: .75; margin-bottom: 24px; }
+        .ws-cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .ws-btn-primary {
+            background: var(--accent); color: #fff; border: none; padding: 13px 26px;
+            border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
+            text-decoration: none; display: inline-block;
+            box-shadow: 0 4px 12px rgba(245,124,0,.4); transition: background .2s, transform .15s;
+        }
+        .ws-btn-primary:hover { background: #e65100; transform: translateY(-2px); }
+        .ws-btn-secondary {
+            background: rgba(255,255,255,.15); color: #fff;
+            border: 2px solid rgba(255,255,255,.45); padding: 13px 22px;
+            border-radius: 10px; font-size: 15px; font-weight: 700; text-decoration: none;
+            display: inline-block; transition: background .2s, transform .15s;
+        }
+        .ws-btn-secondary:hover { background: rgba(255,255,255,.28); transform: translateY(-2px); }
+        .ws-hero-emojis { font-size: 52px; opacity: .3; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0; }
+
+        /* SECTION */
+        .ws-section { background: var(--white); border-radius: var(--radius); padding: 28px 28px; margin-bottom: 22px; box-shadow: var(--shadow); }
+        .ws-section-title { margin-bottom: 22px; }
+        .ws-title-block-mr { font-size: 22px; font-weight: 800; color: var(--primary); }
+        .ws-title-block-en { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+        /* BENEFITS GRID */
+        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 16px; }
+        .benefit-card {
+            background: var(--bg); border-radius: 10px; padding: 20px 16px;
+            border-left: 5px solid var(--primary); transition: transform .2s, box-shadow .2s;
+        }
+        .benefit-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .benefit-icon { font-size: 30px; margin-bottom: 10px; }
+        .benefit-mr { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+        .benefit-en { font-size: 12px; color: var(--muted); }
+
+        /* CATEGORIES TABLE */
+        .cat-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        .cat-table th { background: var(--primary); color: #fff; padding: 12px 16px; text-align: left; font-size: 13px; }
+        .cat-table td { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .cat-table tr:nth-child(even) td { background: #f9fbe7; }
+        .cat-table tr:hover td { background: #e8f5e9; }
+
+        /* ORDER FORM */
+        .order-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 600px) { .order-form { grid-template-columns: 1fr; } }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: var(--text); }
+        .form-group label small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; margin-top: 1px; }
+        .form-group input, .form-group select, .form-group textarea {
+            border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px;
+            font-size: 14px; outline: none; font-family: inherit; transition: border-color .2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-full { grid-column: 1 / -1; }
+        .btn-submit-ws {
+            grid-column: 1 / -1; background: var(--primary); color: #fff; border: none;
+            padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: background .2s, transform .15s; margin-top: 6px;
+        }
+        .btn-submit-ws:hover { background: #145214; transform: translateY(-2px); }
+        .form-note { grid-column: 1/-1; font-size: 12px; color: var(--muted); text-align: center; }
+
+        /* PROCESS STEPS */
+        .steps-row { display: flex; gap: 0; position: relative; flex-wrap: wrap; }
+        .step-card {
+            flex: 1; min-width: 160px; text-align: center; padding: 20px 12px; position: relative;
+        }
+        .step-num {
+            width: 40px; height: 40px; background: var(--primary); color: #fff; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800;
+            margin: 0 auto 12px;
+        }
+        .step-icon { font-size: 28px; margin-bottom: 8px; }
+        .step-mr { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+        .step-en { font-size: 12px; color: var(--muted); }
+        .step-card::after {
+            content: '→'; position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
+            font-size: 20px; color: #c8e6c9; font-weight: 700;
+        }
+        .step-card:last-child::after { display: none; }
+
+        /* FAQ */
+        .faq-item { border-bottom: 1px solid var(--border); padding: 14px 0; }
+        .faq-q {
+            font-size: 15px; font-weight: 700; color: var(--primary); cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; user-select: none;
+        }
+        .faq-q-en { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+        .faq-a { display: none; margin-top: 10px; font-size: 13px; line-height: 1.7; color: var(--text); }
+        .faq-a-en { font-size: 12px; color: var(--muted); margin-top: 4px; }
+        .faq-item.open .faq-a { display: block; }
+        .faq-toggle { font-size: 20px; transition: transform .3s; flex-shrink: 0; }
+        .faq-item.open .faq-toggle { transform: rotate(45deg); }
+
+        /* CONTACT STRIP */
+        .contact-strip {
+            background: linear-gradient(135deg, #f57c00, #e65100); color: #fff;
+            border-radius: var(--radius); padding: 28px 32px; text-align: center; margin-bottom: 0;
+        }
+        .contact-strip h2 { font-size: 24px; font-weight: 900; margin-bottom: 5px; }
+        .contact-strip p { font-size: 14px; opacity: .85; margin-bottom: 20px; }
+        .contact-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .contact-btns a {
+            display: inline-block; text-decoration: none; padding: 12px 26px;
+            border-radius: 10px; font-size: 15px; font-weight: 700; transition: transform .15s, opacity .2s;
+        }
+        .contact-btns a:hover { transform: translateY(-2px); opacity: .9; }
+        .cb-phone { background: #fff; color: #e65100; }
+        .cb-whatsapp { background: #25D366; color: #fff; }
+        .cb-shop { background: rgba(255,255,255,.2); color: #fff; border: 2px solid rgba(255,255,255,.5); }
+
+        /* SUCCESS */
+        #ws-success {
+            display: none; background: #e8f5e9; border: 2px solid #a5d6a7; border-radius: 12px;
+            padding: 24px; text-align: center; margin-top: 16px;
+        }
+        #ws-success .succ-icon { font-size: 48px; margin-bottom: 10px; }
+        #ws-success h3 { font-size: 20px; color: var(--primary); margin-bottom: 5px; }
+
+        footer-ws { display: block; text-align: center; padding: 20px; font-size: 12px; color: var(--muted); }
+    </style>
+</head>
+<body>
+
+<header>
+    <a class="logo" href="index.html">
+        <span style="font-size:26px">🛒</span>
+        <div>
+            <div class="logo-mr">गजानन ट्रेडिंग कंपनी</div>
+            <span class="logo-en">Gajanan Trading Co. • Mantha</span>
+        </div>
+    </a>
+    <nav>
+        <a href="index.html">🏠 दुकान / Shop</a>
+        <a href="tel:9999999999">📞 संपर्क / Call</a>
+    </nav>
+</header>
+
+<div class="page-wrap">
+
+    <!-- HERO -->
+    <div class="wholesale-hero">
+        <div class="ws-hero-text">
+            <div class="ws-badge">🏅 अधिकृत वितरक • Authorized Distributor Since 2010</div>
+            <h1>
+                <div class="ws-title-mr">घाऊक आणि थोक ऑर्डर</div>
+                <div class="ws-title-en">Wholesale & Bulk Orders</div>
+            </h1>
+            <p class="ws-tagline-mr">🌾 रिटेलर्स, हॉटेल्स आणि व्यवसायांसाठी विशेष किंमती</p>
+            <p class="ws-tagline-en">Special pricing for retailers, hotels, canteens & businesses</p>
+            <div class="ws-cta-row">
+                <a href="#ws-form" class="ws-btn-primary" onclick="document.getElementById('ws-form').scrollIntoView({behavior:'smooth'});return false">
+                    📋 ऑर्डर इन्क्वायरी करा &nbsp;<small>Send Enquiry</small>
+                </a>
+                <a href="tel:9999999999" class="ws-btn-secondary">
+                    📞 आत्ता फोन करा &nbsp;<small>Call Now</small>
+                </a>
+            </div>
+        </div>
+        <div class="ws-hero-emojis">
+            <span>🌾</span><span>🫘</span>
+            <span>🧂</span><span>🌶️</span>
+        </div>
+    </div>
+
+    <!-- BENEFITS -->
+    <div class="ws-section">
+        <div class="ws-section-title">
+            <div class="ws-title-block-mr">💰 घाऊक खरेदीचे फायदे</div>
+            <div class="ws-title-block-en">Benefits of Wholesale with Gajanan Trading Co.</div>
+        </div>
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">📉</div>
+                <div class="benefit-mr">विशेष घाऊक किंमती</div>
+                <div class="benefit-en">Exclusive wholesale pricing — up to 15% off retail</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🚚</div>
+                <div class="benefit-mr">घरपोच डिलिव्हरी</div>
+                <div class="benefit-en">Free delivery on orders above ₹5,000 in Mantha area</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">📦</div>
+                <div class="benefit-mr">मोठ्या प्रमाणात साठा</div>
+                <div class="benefit-en">Large quantity packing — 5kg, 10kg, 25kg, 50kg bags</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🏅</div>
+                <div class="benefit-mr">दर्जेदार ब्रँडेड माल</div>
+                <div class="benefit-en">Only genuine branded products — Suhana, Pravin, Tata & more</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">📋</div>
+                <div class="benefit-mr">नियमित पुरवठा</div>
+                <div class="benefit-en">Reliable regular supply for your business continuity</div>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🤝</div>
+                <div class="benefit-mr">विश्वासू संबंध</div>
+                <div class="benefit-en">Long-term trusted relationships with 100+ retailers</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CATEGORIES TABLE -->
+    <div class="ws-section">
+        <div class="ws-section-title">
+            <div class="ws-title-block-mr">📦 आम्ही पुरवत असलेले वर्ग</div>
+            <div class="ws-title-block-en">Product Categories Available for Wholesale</div>
+        </div>
+        <table class="cat-table">
+            <thead>
+                <tr><th>वर्ग / Category</th><th>उत्पादने / Products</th><th>किमान ऑर्डर / Min Qty</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>🌾 तांदूळ आणि धान्य / Rice & Grains</td><td>बासमती, सुरती, कोलम इ.</td><td>25 kg</td></tr>
+                <tr><td>🌾 पीठे / Flours</td><td>गव्हाचे पीठ, मैदा, बेसन इ.</td><td>10 kg</td></tr>
+                <tr><td>🫘 डाळी / Pulses & Lentils</td><td>तूरडाळ, चणाडाळ, मुगडाळ इ.</td><td>10 kg</td></tr>
+                <tr><td>🫙 तेल आणि तूप / Oils & Ghee</td><td>सूर्यफूल तेल, शेंगतेल, तूप</td><td>15 L / 5 kg</td></tr>
+                <tr><td>🌶️ मसाले / Spices & Masalas</td><td>सुहाना, प्रवीण, अमृत मसाला</td><td>1 box (12 pcs)</td></tr>
+                <tr><td>🍬 साखर आणि गूळ / Sugar & Jaggery</td><td>साखर, गूळ, काकवी</td><td>25 kg</td></tr>
+                <tr><td>🥜 सुकामेवा / Dry Fruits & Nuts</td><td>काजू, बदाम, पिस्ता इ.</td><td>5 kg</td></tr>
+                <tr><td>☕ चहा आणि कॉफी / Tea & Coffee</td><td>ताज, टाटा टी, नेस्कॉफी</td><td>1 carton</td></tr>
+                <tr><td>🧹 घरगुती / Household Goods</td><td>साबण, डिटर्जंट, क्लीनर</td><td>1 carton</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PROCESS -->
+    <div class="ws-section">
+        <div class="ws-section-title">
+            <div class="ws-title-block-mr">🔄 ऑर्डर कसे द्यायचे?</div>
+            <div class="ws-title-block-en">How to Place a Wholesale Order — Simple 4-Step Process</div>
+        </div>
+        <div class="steps-row">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <div class="step-icon">📋</div>
+                <div class="step-mr">इन्क्वायरी द्या</div>
+                <div class="step-en">Submit Enquiry Form Below</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <div class="step-icon">📞</div>
+                <div class="step-mr">आम्ही संपर्क करू</div>
+                <div class="step-en">We'll Call You Back</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <div class="step-icon">💰</div>
+                <div class="step-mr">किंमत निश्चित</div>
+                <div class="step-en">Finalise Price & Quantity</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">4</div>
+                <div class="step-icon">🚚</div>
+                <div class="step-mr">डिलिव्हरी मिळवा</div>
+                <div class="step-en">Receive Delivery at Door</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENQUIRY FORM -->
+    <div class="ws-section" id="ws-form">
+        <div class="ws-section-title">
+            <div class="ws-title-block-mr">📬 घाऊक ऑर्डर इन्क्वायरी फॉर्म</div>
+            <div class="ws-title-block-en">Wholesale Enquiry Form — We'll Contact You Within 24 Hours</div>
+        </div>
+        <form class="order-form" onsubmit="submitWsForm(event)">
+            <div class="form-group">
+                <label>तुमचे नाव <small>Full Name *</small></label>
+                <input type="text" id="ws-name" placeholder="संपूर्ण नाव" required>
+            </div>
+            <div class="form-group">
+                <label>मोबाइल नंबर <small>Phone Number *</small></label>
+                <input type="tel" id="ws-phone" placeholder="10-digit number" maxlength="10" required>
+            </div>
+            <div class="form-group">
+                <label>व्यवसायाचे नाव <small>Business / Shop Name</small></label>
+                <input type="text" id="ws-business" placeholder="दुकानाचे / व्यवसायाचे नाव">
+            </div>
+            <div class="form-group">
+                <label>व्यवसायाचा प्रकार <small>Type of Business *</small></label>
+                <select id="ws-type" required>
+                    <option value="">-- निवडा / Select --</option>
+                    <option value="retailer">किराणा दुकान / Retail Grocery Store</option>
+                    <option value="hotel">हॉटेल / Restaurant / Dhaba</option>
+                    <option value="canteen">कॅन्टीन / Canteen</option>
+                    <option value="bulk_buyer">थेट ग्राहक / Bulk Buyer</option>
+                    <option value="other">इतर / Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>गाव / शहर <small>Village / City *</small></label>
+                <input type="text" id="ws-city" placeholder="मंठा / Mantha" required>
+            </div>
+            <div class="form-group">
+                <label>अंदाजे मासिक ऑर्डर <small>Estimated Monthly Order Value</small></label>
+                <select id="ws-amount">
+                    <option value="">-- निवडा / Select --</option>
+                    <option value="5k-20k">₹5,000 – ₹20,000</option>
+                    <option value="20k-50k">₹20,000 – ₹50,000</option>
+                    <option value="50k-1L">₹50,000 – ₹1,00,000</option>
+                    <option value="1L+">₹1,00,000+</option>
+                </select>
+            </div>
+            <div class="form-group form-full">
+                <label>कोणत्या वस्तू हव्यात? <small>Products Required (describe what you need)</small></label>
+                <textarea id="ws-products" rows="3" placeholder="उदाहरण: तांदूळ 50 किलो, तूरडाळ 25 किलो, सुहाना मसाले 2 बॉक्स..."></textarea>
+            </div>
+            <div class="form-group form-full">
+                <label>विशेष सूचना <small>Additional Notes / Requirements</small></label>
+                <textarea id="ws-notes" rows="2" placeholder="कोणत्याही विशेष आवश्यकता किंवा प्रश्न..."></textarea>
+            </div>
+            <button type="submit" class="btn-submit-ws">
+                📤 इन्क्वायरी पाठवा — Submit Enquiry
+            </button>
+            <p class="form-note">⚡ आम्ही २४ तासांच्या आत संपर्क करू • We'll contact you within 24 hours</p>
+        </form>
+        <div id="ws-success">
+            <div class="succ-icon">🎉</div>
+            <h3>इन्क्वायरी मिळाली!</h3>
+            <p style="color:#2e7d32;font-size:15px;font-weight:600">Enquiry Received Successfully!</p>
+            <p style="color:#555;font-size:14px;margin-top:8px">आम्ही लवकरच तुमच्याशी संपर्क करू।<br>We will contact you within 24 hours.</p>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="ws-section">
+        <div class="ws-section-title">
+            <div class="ws-title-block-mr">❓ वारंवार विचारले जाणारे प्रश्न</div>
+            <div class="ws-title-block-en">Frequently Asked Questions — Wholesale FAQ</div>
+        </div>
+        <div id="faq-list">
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <div><div>किमान ऑर्डर किती आहे?</div><div class="faq-q-en">What is the minimum order quantity?</div></div>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-a">
+                    <div>किमान ऑर्डर ₹5,000 आहे. काही उत्पादनांसाठी वेगळ्या मर्यादा असू शकतात.</div>
+                    <div class="faq-a-en">Minimum order is ₹5,000. Individual products may have separate minimum quantity requirements as listed in the table above.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <div><div>डिलिव्हरी मोफत आहे का?</div><div class="faq-q-en">Is delivery free?</div></div>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-a">
+                    <div>₹5,000 पेक्षा जास्त ऑर्डरसाठी मंठा परिसरात डिलिव्हरी मोफत आहे. दूरच्या ठिकाणी किंमत वेगळी असेल.</div>
+                    <div class="faq-a-en">Free delivery within Mantha area for orders above ₹5,000. Additional charges may apply for distant locations.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <div><div>पेमेंट कसे करायचे?</div><div class="faq-q-en">What are the payment options?</div></div>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-a">
+                    <div>रोख, UPI (PhonePe/GPay), बँक ट्रान्सफर स्वीकारले जाते. नियमित व्यावसायिक ग्राहकांसाठी उधारी सुविधा देखील उपलब्ध आहे.</div>
+                    <div class="faq-a-en">We accept Cash, UPI (PhonePe/GPay), and Bank Transfer. Credit facility is available for established business customers.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <div><div>ऑर्डर किती दिवसांत येते?</div><div class="faq-q-en">How soon will my order be delivered?</div></div>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-a">
+                    <div>मंठा परिसरात साधारणतः ऑर्डरच्या दुसऱ्या दिवशी डिलिव्हरी होते. मोठ्या ऑर्डरसाठी २-३ दिवस लागू शकतात.</div>
+                    <div class="faq-a-en">Typically next-day delivery within Mantha area. Larger orders may take 2-3 working days.</div>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q" onclick="toggleFaq(this)">
+                    <div><div>मी नवीन व्यावसायिक ग्राहक आहे, कसे सुरू करायचे?</div><div class="faq-q-en">I'm a new business customer, how do I start?</div></div>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-a">
+                    <div>खालील फॉर्म भरा किंवा थेट फोन करा. आमचे प्रतिनिधी तुमच्याशी संपर्क करतील आणि सर्व माहिती देतील.</div>
+                    <div class="faq-a-en">Fill the enquiry form above or call us directly. Our team will contact you and guide you through the entire process.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTACT STRIP -->
+    <div class="contact-strip">
+        <h2>📦 घाऊक ऑर्डरसाठी आत्ताच संपर्क करा!</h2>
+        <p>Ready to start? Contact us now — Wholesale & Bulk Supply for Mantha & Surrounding Areas</p>
+        <div class="contact-btns">
+            <a href="tel:9999999999" class="cb-phone">📞 9999999999 — Call Now</a>
+            <a href="https://wa.me/919999999999" target="_blank" class="cb-whatsapp">💬 WhatsApp करा</a>
+            <a href="index.html" class="cb-shop">🛒 दुकानात जा / Visit Shop</a>
+        </div>
+    </div>
+
+</div>
+
+<footer-ws>
+    <p>© 2025 Gajanan Trading Co. • Mantha, Dist. Jalna, Maharashtra • All Rights Reserved</p>
+</footer-ws>
+
+<script>
+function toggleFaq(el) {
+    el.closest('.faq-item').classList.toggle('open');
+}
+
+function submitWsForm(e) {
+    e.preventDefault();
+    const name    = document.getElementById('ws-name').value.trim();
+    const phone   = document.getElementById('ws-phone').value.trim();
+    const type    = document.getElementById('ws-type').value;
+    const city    = document.getElementById('ws-city').value.trim();
+    if (!name || !phone || !type || !city) {
+        alert('कृपया सर्व आवश्यक माहिती भरा! (Please fill all required fields)');
+        return;
+    }
+    if (!/^\d{10}$/.test(phone)) {
+        alert('कृपया 10 अंकी मोबाइल नंबर टाका!');
+        return;
+    }
+    // Show success (in production, you'd POST this to your server)
+    document.querySelector('.order-form').style.display = 'none';
+    document.getElementById('ws-success').style.display = 'block';
+    document.getElementById('ws-success').scrollIntoView({ behavior: 'smooth' });
+    console.log('Wholesale Enquiry:', { name, phone, type, city,
+        business: document.getElementById('ws-business').value,
+        amount: document.getElementById('ws-amount').value,
+        products: document.getElementById('ws-products').value,
+        notes: document.getElementById('ws-notes').value
+    });
+}
+</script>
+</body>
+</html>
