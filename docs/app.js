@@ -309,7 +309,7 @@ async function loadProducts() {
                 unit:           unit,
                 unit_options:   defaultQtyOptions(unit),
                 allow_custom:   true,
-                in_stock:       (p["Stock"] || "").toLowerCase() !== "out of stock",
+                in_stock:       String(p.Stock || "").toLowerCase() !== "out of stock",
                 image:          (p["Image Link"] || "").trim() || null,
             };
         });
