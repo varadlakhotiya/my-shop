@@ -511,51 +511,47 @@ body {
 .add-btn:hover { background: var(--primary-hover); }
 .add-btn:disabled { background: #bdbdbd; cursor: not-allowed; }
 
-/* ══════════════════════════════════════════════
-   MODALS
-   ══════════════════════════════════════════════ */
+/* ===== MODAL SYSTEM ===== */
+
 .modal-backdrop {
-    display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 1200;
+    background: rgba(0,0,0,0.5);
+    display: none;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    z-index: 9999;
 }
-.modal-backdrop.open { display: flex; }
+
+.modal-backdrop.open {
+    display: flex;
+}
 
 .modal-box {
     background: #fff;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 460px;
+    border-radius: 12px;
+    max-width: 900px;
+    width: 95%;
     max-height: 90vh;
     overflow-y: auto;
-    padding: 28px;
+    padding: 24px;
     position: relative;
-    box-shadow: var(--shadow-lg);
+    animation: modalFade 0.2s ease;
 }
 
 .modal-close {
     position: absolute;
-    top: 14px;
-    right: 14px;
-    background: #f5f5f5;
+    top: 10px;
+    right: 15px;
     border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    background: none;
+    font-size: 20px;
     cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #555;
-    width: auto;
-    padding: 0;
-    width: 32px;
+}
+
+@keyframes modalFade {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 .modal-close:hover { background: #e0e0e0; }
 

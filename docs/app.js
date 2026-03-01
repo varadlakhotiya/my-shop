@@ -114,33 +114,6 @@ const PICKUP_SLOTS = [
     { id: 's5', label: '6:00 PM – 8:00 PM',    mr: 'संध्याकाळी ६ – ८' },
 ];
 
-// === SAFETY: Force-close any stray modals/overlays ===
-function forceCloseAllModals() {
-  try {
-    // remove modal-open body state
-    document.body.classList.remove('modal-open');
-
-    // hide common modal/backdrop classes used in your markup
-    document.querySelectorAll('.modal-backdrop, .modal, .overlay, .backdrop, .modal-box').forEach(el => {
-      // remove any 'open' class and force-hide
-      el.classList.remove('open');
-      el.style.display = 'none';
-      el.style.visibility = 'hidden';
-      el.style.opacity = '0';
-    });
-
-    // call close handlers if they exist (safe-guard)
-    ['closeOtpModal','closeCheckout','closeProductModal','closeSuccess','closeWishlist','closeSectionPopup','closeCart'].forEach(fnName => {
-      if (typeof window[fnName] === 'function') {
-        try { window[fnName](); } catch(e) { /* ignore */ }
-      }
-    });
-
-    console.info('forceCloseAllModals: all modal/backdrops hidden');
-  } catch (e) {
-    console.warn('forceCloseAllModals error', e);
-  }
-}
 
 
 
@@ -1761,50 +1734,75 @@ function showToast(message, type = '') {
     setTimeout(() => toast.remove(), 3100);
 }
 
-/* ══════════════════════════════════════════════
-   SECTION POPUP — Right sidebar buttons
-   ══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   SAFE MODAL SYSTEM
+   ═══════════════════════════════════════ */
+
 function openSectionPopup(key) {
-    const modal   = document.getElementById('section-popup-modal');
-    const content = document.getElementById('section-popup-content');
-    if (!modal || !content) return;
+    try {
+        const modal = document.getElementById("section-popup-modal");
+        const content = document.getElementById("section-popup-content");
 
-    const sourceIds = {
-        popular:      'popular-section',
-        why:          'why-us-section',
-        about:        'about-section',
-        brands:       'brands-section',
-        testimonials: 'testimonials-section',
-        gallery:      'gallery-section',
-    };
+        if (!modal || !content) {
+            console.error("Modal elements not found.");
+            return;
+        }
 
-    if (key === 'gallery') {
-        // Gallery gets a live-built carousel, not the hidden section's content
-        content.innerHTML = buildGalleryCarousel();
-        initGalleryCarousel();
-    } else {
-        const sourceEl = document.getElementById(sourceIds[key]);
-        content.innerHTML = sourceEl ? sourceEl.innerHTML : '<p>Content not found.</p>';
+        // Close any existing modals first
+        closeAllModals();
+
+        // Get section content safely
+        let sourceSection = null;
+
+        if (key === "popular") sourceSection = document.getElementById("popular-section");
+        if (key === "why") sourceSection = document.getElementById("why-us-section");
+        if (key === "about") sourceSection = document.getElementById("about-section");
+        if (key === "brands") sourceSection = document.getElementById("brands-section");
+        if (key === "testimonials") sourceSection = document.getElementById("testimonials-section");
+        if (key === "gallery") sourceSection = document.getElementById("gallery-section");
+
+        if (!sourceSection) {
+            content.innerHTML = "<div style='padding:20px'>Content not available.</div>";
+        } else {
+            content.innerHTML = sourceSection.innerHTML;
+        }
+
+        modal.classList.add("open");
+        document.body.style.overflow = "hidden";
+
+    } catch (err) {
+        console.error("Popup error:", err);
     }
-
-    // Highlight active button — both desktop sidebar and mobile bar
-    document.querySelectorAll('.info-sidebar-btn, .mob-info-btn').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.querySelector(`.info-sidebar-btn[onclick="openSectionPopup('${key}')"]`);
-    if (activeBtn) activeBtn.classList.add('active');
-    const activeMobBtn = document.querySelector(`.mob-info-btn[onclick="openSectionPopup('${key}')"]`);
-    if (activeMobBtn) activeMobBtn.classList.add('active');
-
-    modal.classList.add('open');
-    modal.onclick = function(e) { if (e.target === modal) closeSectionPopup(); };
 }
 
 function closeSectionPopup() {
-    const modal = document.getElementById('section-popup-modal');
-    if (modal) modal.classList.remove('open');
-    document.querySelectorAll('.info-sidebar-btn, .mob-info-btn').forEach(b => b.classList.remove('active'));
+    const modal = document.getElementById("section-popup-modal");
+    if (!modal) return;
+
+    modal.classList.remove("open");
+    document.body.style.overflow = "auto";
+
+    const content = document.getElementById("section-popup-content");
+    if (content) content.innerHTML = "";
 }
 
-// After initial rendering — ensure no modal overlay stuck open:
-setTimeout(() => {
-  forceCloseAllModals();
-}, 250); // run shortly after boot to clear any late-opens
+function closeAllModals() {
+    document.querySelectorAll(".modal-backdrop").forEach(m => {
+        m.classList.remove("open");
+    });
+
+    document.body.style.overflow = "auto";
+}
+
+/* Close when clicking outside box */
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("section-popup-modal");
+
+    if (modal) {
+        modal.addEventListener("click", function (e) {
+            if (e.target === modal) {
+                closeSectionPopup();
+            }
+        });
+    }
+});
