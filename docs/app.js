@@ -189,24 +189,14 @@ window.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Check server + load data
-    const ok = await checkServer();
-    if (!ok) {
-        // running in static/offline mode — ensure no stray modal overlay remains
-        forceCloseAllModals();
-        // optionally show a simple banner instead of a modal
-        showFatalError('Server unavailable — running in offline mode',
-            'The site is running as a static frontend. Product data should still load from <code>products.json</code>.');
-        return;
-    }
-
-    await loadCategories();
-    await loadProducts();
+    // Static mode — load everything from products.json (no server needed)
+    await loadProducts();       // loads & transforms products.json
+    loadCategoriesFromProducts(); // derives category list from loaded products
     renderCategoryGrid();
     renderSidebar();
     updateCartUI();
-    updateWishlistBadge(); // Feature 3
-    renderHomePageSections(); // New home sections
+    updateWishlistBadge();
+    renderHomePageSections();
 
     document.getElementById('search-input')
         .addEventListener('input', debounce(onSearch, 350));
@@ -240,14 +230,109 @@ async function loadCategories() {
     }
 }
 
+/* ── Broad-category → numeric ID map (used for sidebar icons) ── */
+const BROAD_CAT_IDS = {
+    "Rice & Grains":       1,
+    "Flours":              2,
+    "Pulses & Legumes":    3,
+    "Oils & Ghee":         4,
+    "Whole Spices":        5,
+    "Ground Spices":       6,
+    "Salt, Sugar":         7,
+    "Dry Fruits":          8,
+    "Fasting":             9,
+    "Beverages":           10,
+    "Baking & Condiments": 11,
+    "Papad, Pickles":      12,
+    "Snacks & Sweets":     13,
+    "Pooja Needs":         14,
+    "Household":           15,
+    "Personal Care":       16,
+};
+
+const BROAD_CAT_MARATHI = {
+    "Rice & Grains":       "तांदूळ व धान्य",
+    "Flours":              "पीठ",
+    "Pulses & Legumes":    "डाळी व कडधान्य",
+    "Oils & Ghee":         "तेल व तूप",
+    "Whole Spices":        "साबुत मसाले",
+    "Ground Spices":       "दळलेले मसाले",
+    "Salt, Sugar":         "मीठ, साखर",
+    "Dry Fruits":          "सुका मेवा",
+    "Fasting":             "उपवास",
+    "Beverages":           "पेय",
+    "Baking & Condiments": "बेकिंग व सॉस",
+    "Papad, Pickles":      "पापड, लोणचे",
+    "Snacks & Sweets":     "स्नॅक्स व मिठाई",
+    "Pooja Needs":         "पूजा साहित्य",
+    "Household":           "घरगुती",
+    "Personal Care":       "वैयक्तिक काळजी",
+};
+
+function parsePriceUnit(str) {
+    if (!str) return { price: 0, unit: "piece" };
+    const cleaned = str.replace(/₹/g, "").replace(/\s/g, "");
+    const match   = cleaned.match(/^([\d.]+)\/(.+)$/);
+    if (match) return { price: parseFloat(match[1]), unit: match[2] };
+    const numOnly = cleaned.match(/^([\d.]+)$/);
+    if (numOnly) return { price: parseFloat(numOnly[1]), unit: "piece" };
+    return { price: 0, unit: "piece" };
+}
+
+function defaultQtyOptions(unit) {
+    const u = (unit || "").toLowerCase();
+    if (u === "kg")                         return [0.5, 1, 2, 5, 10];
+    if (u === "g")                          return [100, 250, 500, 1000];
+    if (["litre","ltr","l"].includes(u))  return [0.5, 1, 2, 5];
+    if (u === "ml")                         return [100, 250, 500, 1000];
+    return [1, 2, 5, 10];
+}
+
 async function loadProducts() {
-  try {
-    const res = await fetch("products.json");
-    allProducts = await res.json();
-  } catch (err) {
-    console.error("Failed to load products.json", err);
-    allProducts = [];
-  }
+    try {
+        const res = await fetch("products.json");
+        const raw = await res.json();
+        allProducts = raw.map((p, idx) => {
+            const { price, unit } = parsePriceUnit(p["Approx. Price & Unit"]);
+            const broadCat = (p["Category"] || "").trim();
+            const catId    = BROAD_CAT_IDS[broadCat] || 99;
+            return {
+                id:             p["Id"] || (idx + 1),
+                name:           (p["category_english"] || p["Sub-Category"] || "").trim(),
+                name_marathi:   (p["category_marathi"] || "").trim() || null,
+                sub_category:   (p["Sub-Category"] || "").trim(),
+                category_id:    catId,
+                category_name:  broadCat,
+                brand_english:  (p["Brand Name (EN)"] || "").trim() || null,
+                brand_marathi:  (p["Brand Name (MR)"] || "").trim() || null,
+                price_per_unit: price,
+                unit:           unit,
+                unit_options:   defaultQtyOptions(unit),
+                allow_custom:   true,
+                in_stock:       (p["Stock"] || "").toLowerCase() !== "out of stock",
+                image:          (p["Image Link"] || "").trim() || null,
+            };
+        });
+    } catch (err) {
+        console.error("Failed to load products.json", err);
+        allProducts = [];
+    }
+}
+
+function loadCategoriesFromProducts() {
+    const seen = new Set();
+    categories = [];
+    for (const p of allProducts) {
+        if (!seen.has(p.category_id)) {
+            seen.add(p.category_id);
+            categories.push({
+                id:           p.category_id,
+                name_english: p.category_name,
+                name_marathi: BROAD_CAT_MARATHI[p.category_name] || p.category_name,
+            });
+        }
+    }
+    categories.sort((a, b) => a.id - b.id);
 }
 
 /* ══════════════════════════════════════════════
